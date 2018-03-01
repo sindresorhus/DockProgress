@@ -82,7 +82,7 @@ public final class DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * CGFloat(self.progressValue)
+		barProgress.size.width = barProgress.width * CGFloat(progressValue)
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}

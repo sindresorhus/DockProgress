@@ -4,7 +4,7 @@
 
 <img src="screenshot.gif" width="485">
 
-This package is used in production by the [Gifski app](https://github.com/sindresorhus/gifski-app).
+This package is used in production by the [Gifski app](https://github.com/sindresorhus/gifski-app). You might also like some of my [other apps](https://sindresorhus.com/#apps).
 
 
 ## Requirements
@@ -28,6 +28,10 @@ With [Carthage](https://swift.org/package-manager/):
 github "sindresorhus/DockProgress"
 ```
 
+<a href="https://www.patreon.com/sindresorhus">
+	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
+</a>
+
 
 ## Usage
 
@@ -37,7 +41,7 @@ github "sindresorhus/DockProgress"
 import Cocoa
 import DockProgress
 
-foo.onUpdate = { progress
+foo.onUpdate = { progress in
 	DockProgress.progressValue = progress
 }
 ```

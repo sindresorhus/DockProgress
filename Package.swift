@@ -6,13 +6,15 @@ let package = Package(
     products: [
         .library(
             name: "DockProgress",
-            targets: ["DockProgress"]),
+            targets: ["DockProgress"]
+		)
     ],
     targets: [
         .target(
             name: "DockProgress"
         .testTarget(
             name: "DockProgressTests",
-            dependencies: ["DockProgress"]),
+            dependencies: ["DockProgress"]
+		)
     ]
 )
