@@ -22,7 +22,7 @@ With [SPM](https://swift.org/package-manager/):
 .package(url: "https://github.com/sindresorhus/DockProgress", from: "1.0.0")
 ```
 
-With [Carthage](https://swift.org/package-manager/):
+With [Carthage](https://github.com/Carthage/Carthage):
 
 ```
 github "sindresorhus/DockProgress"
