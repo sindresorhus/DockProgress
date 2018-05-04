@@ -92,6 +92,7 @@ Make sure to set a `radius` that matches your app icon.
 
 ## Related
 
+- [Defaults](https://github.com/sindresorhus/Defaults) - Swifty and modern UserDefaults
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
 
 
