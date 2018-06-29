@@ -28,6 +28,12 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 github "sindresorhus/DockProgress"
 ```
 
+#### CocoaPods
+
+```ruby
+pod 'Preferences'
+```
+
 <a href="https://www.patreon.com/sindresorhus">
 	<img src="https://c5.patreon.com/external/logo/become_a_patron_button@2x.png" width="160">
 </a>
