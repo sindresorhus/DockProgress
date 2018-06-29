@@ -93,6 +93,7 @@ Make sure to set a `radius` that matches your app icon.
 ## Related
 
 - [Defaults](https://github.com/sindresorhus/Defaults) - Swifty and modern UserDefaults
+- [Preferences](https://github.com/sindresorhus/Preferences) - Add a preferences window to your macOS app in minutes
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
 
 
