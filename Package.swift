@@ -2,19 +2,16 @@
 import PackageDescription
 
 let package = Package(
-    name: "DockProgress",
-    products: [
-        .library(
-            name: "DockProgress",
-            targets: ["DockProgress"]
+	name: "DockProgress",
+	products: [
+		.library(
+			name: "DockProgress",
+			targets: ["DockProgress"]
 		)
-    ],
-    targets: [
-        .target(
-            name: "DockProgress"
-        .testTarget(
-            name: "DockProgressTests",
-            dependencies: ["DockProgress"]
+	],
+	targets: [
+		.target(
+			name: "DockProgress"
 		)
-    ]
+	]
 )

@@ -16,13 +16,13 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 
 ## Install
 
-With [SPM](https://swift.org/package-manager/):
+#### SPM
 
 ```swift
 .package(url: "https://github.com/sindresorhus/DockProgress", from: "1.0.0")
 ```
 
-With [Carthage](https://github.com/Carthage/Carthage):
+#### Carthage
 
 ```
 github "sindresorhus/DockProgress"
