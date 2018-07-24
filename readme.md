@@ -69,6 +69,8 @@ DockProgress.progress = progress
 
 It comes with two styles. PR welcome for more.
 
+Check out the example app in the Xcode project.
+
 You can also draw a custom progress with `.custom(drawHandler: (_ rect: CGRect) -> Void)`.
 
 ### Bar

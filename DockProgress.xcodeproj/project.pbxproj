@@ -7,19 +7,59 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		E3FB30C420EA5DBC009BA1BD /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3FB30C320EA5DBC009BA1BD /* AppDelegate.swift */; };
+		E3FB30C920EA5DBE009BA1BD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E3FB30C720EA5DBE009BA1BD /* MainMenu.xib */; };
+		E3FB30CF20EA5EBD009BA1BD /* DockProgress.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "DockProgress::DockProgress::Product" /* DockProgress.framework */; };
+		E3FB30D020EA5EBD009BA1BD /* DockProgress.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = "DockProgress::DockProgress::Product" /* DockProgress.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		OBJ_19 /* DockProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* DockProgress.swift */; };
 		OBJ_20 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* util.swift */; };
 		OBJ_27 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		E3FB30D120EA5EBD009BA1BD /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = OBJ_1 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = "DockProgress::DockProgress";
+			remoteInfo = DockProgress;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		E3FB30D320EA5EBD009BA1BD /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				E3FB30D020EA5EBD009BA1BD /* DockProgress.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		"DockProgress::DockProgress::Product" /* DockProgress.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = DockProgress.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_10 /* util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = util.swift; sourceTree = "<group>"; };
+		E3FB30C120EA5DBC009BA1BD /* DockProgressExample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = DockProgressExample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E3FB30C320EA5DBC009BA1BD /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; usesTabs = 1; };
+		E3FB30C820EA5DBE009BA1BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
+		E3FB30CA20EA5DBE009BA1BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		OBJ_10 /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = util.swift; sourceTree = "<group>"; usesTabs = 1; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
-		OBJ_9 /* DockProgress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DockProgress.swift; sourceTree = "<group>"; };
+		OBJ_9 /* DockProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DockProgress.swift; sourceTree = "<group>"; usesTabs = 1; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		E3FB30BE20EA5DBC009BA1BD /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3FB30CF20EA5EBD009BA1BD /* DockProgress.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		OBJ_21 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
@@ -30,6 +70,16 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		E3FB30C220EA5DBC009BA1BD /* Example */ = {
+			isa = PBXGroup;
+			children = (
+				E3FB30C320EA5DBC009BA1BD /* AppDelegate.swift */,
+				E3FB30C720EA5DBE009BA1BD /* MainMenu.xib */,
+				E3FB30CA20EA5DBE009BA1BD /* Info.plist */,
+			);
+			path = Example;
+			sourceTree = "<group>";
+		};
 		OBJ_11 /* Tests */ = {
 			isa = PBXGroup;
 			children = (
@@ -41,6 +91,7 @@
 			isa = PBXGroup;
 			children = (
 				"DockProgress::DockProgress::Product" /* DockProgress.framework */,
+				E3FB30C120EA5DBC009BA1BD /* DockProgressExample.app */,
 			);
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -51,9 +102,11 @@
 				OBJ_6 /* Package.swift */,
 				OBJ_7 /* Sources */,
 				OBJ_11 /* Tests */,
+				E3FB30C220EA5DBC009BA1BD /* Example */,
 				OBJ_12 /* Products */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		OBJ_7 /* Sources */ = {
 			isa = PBXGroup;
@@ -106,20 +159,45 @@
 			productName = DockProgressPackageDescription;
 			productType = "com.apple.product-type.framework";
 		};
+		E3FB30C020EA5DBC009BA1BD /* DockProgressExample */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = E3FB30CE20EA5DBE009BA1BD /* Build configuration list for PBXNativeTarget "DockProgressExample" */;
+			buildPhases = (
+				E3FB30BD20EA5DBC009BA1BD /* Sources */,
+				E3FB30BE20EA5DBC009BA1BD /* Frameworks */,
+				E3FB30BF20EA5DBC009BA1BD /* Resources */,
+				E3FB30D320EA5EBD009BA1BD /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				E3FB30D220EA5EBD009BA1BD /* PBXTargetDependency */,
+			);
+			name = DockProgressExample;
+			productName = DockProgressExample;
+			productReference = E3FB30C120EA5DBC009BA1BD /* DockProgressExample.app */;
+			productType = "com.apple.product-type.application";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		OBJ_1 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0940;
 				LastUpgradeCheck = 0940;
+				TargetAttributes = {
+					E3FB30C020EA5DBC009BA1BD = {
+						CreatedOnToolsVersion = 9.4.1;
+					};
+				};
 			};
 			buildConfigurationList = OBJ_2 /* Build configuration list for PBXProject "DockProgress" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
 			knownRegions = (
-				en,
+				Base,
 			);
 			mainGroup = OBJ_5;
 			productRefGroup = OBJ_12 /* Products */;
@@ -128,11 +206,31 @@
 			targets = (
 				"DockProgress::DockProgress" /* DockProgress */,
 				"DockProgress::SwiftPMPackageDescription" /* DockProgressPackageDescription */,
+				E3FB30C020EA5DBC009BA1BD /* DockProgressExample */,
 			);
 		};
 /* End PBXProject section */
 
+/* Begin PBXResourcesBuildPhase section */
+		E3FB30BF20EA5DBC009BA1BD /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3FB30C920EA5DBE009BA1BD /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
+		E3FB30BD20EA5DBC009BA1BD /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				E3FB30C420EA5DBC009BA1BD /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		OBJ_18 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
@@ -152,10 +250,111 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		E3FB30D220EA5EBD009BA1BD /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = "DockProgress::DockProgress" /* DockProgress */;
+			targetProxy = E3FB30D120EA5EBD009BA1BD /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		E3FB30C720EA5DBE009BA1BD /* MainMenu.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				E3FB30C820EA5DBE009BA1BD /* Base */,
+			);
+			name = MainMenu.xib;
+			sourceTree = "<group>";
+			usesTabs = 1;
+		};
+/* End PBXVariantGroup section */
+
 /* Begin XCBuildConfiguration section */
+		E3FB30CC20EA5DBE009BA1BD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = "";
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = Example/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sindresorhus.DockProgressExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_VERSION = 4.0;
+			};
+			name = Debug;
+		};
+		E3FB30CD20EA5DBE009BA1BD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_IDENTITY = "";
+				CODE_SIGN_STYLE = Manual;
+				COMBINE_HIDPI_IMAGES = YES;
+				COPY_PHASE_STRIP = NO;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_NS_ASSERTIONS = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				INFOPLIST_FILE = Example/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = com.sindresorhus.DockProgressExample;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SWIFT_VERSION = 4.0;
+			};
+			name = Release;
+		};
 		OBJ_16 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEVELOPMENT_TEAM = "";
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -182,6 +381,7 @@
 		OBJ_17 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				DEVELOPMENT_TEAM = "";
 				ENABLE_TESTABILITY = YES;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
@@ -322,6 +522,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		E3FB30CE20EA5DBE009BA1BD /* Build configuration list for PBXNativeTarget "DockProgressExample" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				E3FB30CC20EA5DBE009BA1BD /* Debug */,
+				E3FB30CD20EA5DBE009BA1BD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		OBJ_15 /* Build configuration list for PBXNativeTarget "DockProgress" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
