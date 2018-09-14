@@ -4,14 +4,14 @@
 
 <img src="screenshot.gif" width="485">
 
-This package is used in production by the [Gifski app](https://github.com/sindresorhus/gifski-app). You might also like some of my [other apps](https://sindresorhus.com/#apps).
+This package is used in production by the [Gifski app](https://github.com/sindresorhus/gifski-app). You might also like some of my [other apps](https://sindresorhus.com/apps).
 
 
 ## Requirements
 
 - macOS 10.12+
-- Xcode 9.3+
-- Swift 4.1+
+- Xcode 10+
+- Swift 4.2+
 
 
 ## Install
@@ -103,6 +103,7 @@ Make sure to set a `radius` that matches your app icon.
 - [Defaults](https://github.com/sindresorhus/Defaults) - Swifty and modern UserDefaults
 - [Preferences](https://github.com/sindresorhus/Preferences) - Add a preferences window to your macOS app in minutes
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
+- [More…](https://github.com/search?q=user%3Asindresorhus+language%3Aswift)
 
 
 ## License
