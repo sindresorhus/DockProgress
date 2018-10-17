@@ -31,7 +31,7 @@ github "sindresorhus/DockProgress"
 #### CocoaPods
 
 ```ruby
-pod 'Preferences'
+pod 'DockProgress'
 ```
 
 <a href="https://www.patreon.com/sindresorhus">
