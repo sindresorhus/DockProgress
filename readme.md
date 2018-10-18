@@ -16,7 +16,7 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 
 ## Install
 
-#### SPM
+#### SwiftPM
 
 ```swift
 .package(url: "https://github.com/sindresorhus/DockProgress", from: "1.0.0")
