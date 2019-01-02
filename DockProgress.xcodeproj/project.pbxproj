@@ -11,6 +11,7 @@
 		E3FB30C920EA5DBE009BA1BD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E3FB30C720EA5DBE009BA1BD /* MainMenu.xib */; };
 		E3FB30CF20EA5EBD009BA1BD /* DockProgress.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = "DockProgress::DockProgress::Product" /* DockProgress.framework */; };
 		E3FB30D020EA5EBD009BA1BD /* DockProgress.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = "DockProgress::DockProgress::Product" /* DockProgress.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E3FEB1AB21DC4F70009C38CA /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = E3FEB1AA21DC4F70009C38CA /* Images.xcassets */; };
 		OBJ_19 /* DockProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* DockProgress.swift */; };
 		OBJ_20 /* util.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_10 /* util.swift */; };
 		OBJ_27 /* Package.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_6 /* Package.swift */; };
@@ -46,6 +47,7 @@
 		E3FB30C320EA5DBC009BA1BD /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = AppDelegate.swift; sourceTree = "<group>"; usesTabs = 1; };
 		E3FB30C820EA5DBE009BA1BD /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		E3FB30CA20EA5DBE009BA1BD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E3FEB1AA21DC4F70009C38CA /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
 		OBJ_10 /* util.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = util.swift; sourceTree = "<group>"; usesTabs = 1; };
 		OBJ_6 /* Package.swift */ = {isa = PBXFileReference; explicitFileType = sourcecode.swift; path = Package.swift; sourceTree = "<group>"; };
 		OBJ_9 /* DockProgress.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = DockProgress.swift; sourceTree = "<group>"; usesTabs = 1; };
@@ -76,6 +78,7 @@
 				E3FB30C320EA5DBC009BA1BD /* AppDelegate.swift */,
 				E3FB30C720EA5DBE009BA1BD /* MainMenu.xib */,
 				E3FB30CA20EA5DBE009BA1BD /* Info.plist */,
+				E3FEB1AA21DC4F70009C38CA /* Images.xcassets */,
 			);
 			path = Example;
 			sourceTree = "<group>";
@@ -213,6 +216,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E3FB30C920EA5DBE009BA1BD /* MainMenu.xib in Resources */,
+				E3FEB1AB21DC4F70009C38CA /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -272,6 +276,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
@@ -313,6 +318,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";

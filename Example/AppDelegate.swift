@@ -5,7 +5,7 @@ import DockProgress
 final class AppDelegate: NSObject, NSApplicationDelegate {
 	func borrowIconFrom(app: String) {
 		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.fullPath(forApplication: app)!)
-		icon.size = NSApp.applicationIconImage.size
+		icon.size = CGSize(width: 128, height: 128)
 		NSApp.applicationIconImage = icon
 	}
 
