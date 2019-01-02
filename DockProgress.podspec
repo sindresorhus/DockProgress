@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
 	s.name = 'DockProgress'
-	s.version = '1.1.0'
+	s.version = '1.2.0'
 	s.summary = 'Show progress in your app\'s Dock icon'
 	s.license = 'MIT'
 	s.homepage = 'https://github.com/sindresorhus/DockProgress'
