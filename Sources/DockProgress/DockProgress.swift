@@ -107,24 +107,30 @@ public final class DockProgress {
 			return
 		}
 
-		let radius = CGFloat(dstRect.width/4.5)
+		let radius = dstRect.width / 4.5
 		let newCenter = CGPoint(x: dstRect.maxX - radius - 4, y: dstRect.minY + radius + 4)
-		let progressCircle = ProgressCircleShapeLayer(radius: Double(radius), center: newCenter)
 
-		// setup badge label
-		let dimension = progressCircle.bounds.height - 5
-		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
-		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
-		textLayer.foregroundColor = CGColor(red:0.23,green:0.23,blue:0.24,alpha:1.00)
-		textLayer.string = badgeLabel
+		// background
+		let badge = ProgressCircleShapeLayer(radius: Double(radius), center: newCenter)
+		badge.fillColor = CGColor(red: 0.94, green: 0.96, blue: 1.00, alpha: 1.00)
 
-		progressCircle.addSublayer(textLayer)
+		// progress circle
+		let lineWidth: CGFloat = 6
+		let progressCircle = ProgressCircleShapeLayer(radius: Double(radius) - Double(lineWidth / 2), center: newCenter)
 		progressCircle.strokeColor = color.cgColor
-		progressCircle.fillColor = CGColor(red:0.94, green:0.96, blue:1.00, alpha:1.00)
-		progressCircle.lineWidth = 7
-		progressCircle.cornerRadius = 3
+		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .square
 		progressCircle.progress = progressValue
-		progressCircle.render(in: cgContext)
+
+		// label
+		let dimension = badge.bounds.height - 5
+		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
+		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
+		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1.00)
+		textLayer.string = badgeLabel
+
+		badge.addSublayer(textLayer)
+		badge.addSublayer(progressCircle)
+		badge.render(in: cgContext)
 	}
 }

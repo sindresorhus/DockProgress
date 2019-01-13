@@ -21,9 +21,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 		Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
 			DockProgress.progressValue += 0.01
-			
+
 			if DockProgress.progressValue > 1 {
-				
+
 				if let style = stylesIterator.next() {
 					DockProgress.progressValue = 0
 					DockProgress.style = style

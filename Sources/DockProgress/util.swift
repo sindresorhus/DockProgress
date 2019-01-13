@@ -41,6 +41,7 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		self.init()
 		fillColor = nil
 		lineCap = .round
+		position = center
 		path = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
 		if let boundingBox = path?.boundingBox {
 			bounds = boundingBox
@@ -118,7 +119,8 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		frame.center = center
 		alignmentMode = .center
 		truncationMode = .end
-		fontSize = 27
+		font = NSFont(name: "HelveticaNeue-Bold", size: 0)
+		fontSize = 25
 		contentsScale = NSScreen.main!.backingScaleFactor
 	}
 
