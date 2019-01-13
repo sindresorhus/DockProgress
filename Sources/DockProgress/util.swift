@@ -42,9 +42,12 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		fillColor = nil
 		lineCap = .round
 		path = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
+		if let boundingBox = path?.boundingBox {
+			bounds = boundingBox
+		}
 		strokeEnd = 0
 	}
-
+	
 	var progress: Double {
 		get {
 			return Double(strokeEnd)
@@ -104,5 +107,22 @@ extension NSBezierPath {
 	/// UIKit polyfill
 	convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat) {
 		self.init(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
+	}
+}
+
+class VerticallyCenteredTextLayer : CATextLayer {
+	
+	// REF: https://stackoverflow.com/a/44055040/6863743
+	// CREDIT: David Hoerl - https://github.com/dhoerl
+	// USAGE: To fix the vertical alignment issue that currently exists within the CATextLayer class.
+	override func draw(in ctx: CGContext) {
+		let fontSize = self.fontSize
+		let height = self.bounds.size.height
+		let deltaY = ((height-fontSize)/2 - fontSize/10) * -1
+		
+		ctx.saveGState()
+		ctx.translateBy(x: 0.0, y: deltaY)
+		super.draw(in: ctx)
+		ctx.restoreGState()
 	}
 }

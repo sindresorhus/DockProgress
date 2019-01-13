@@ -32,6 +32,7 @@ public final class DockProgress {
 		case bar
 		/// TODO: Make `color` optional when https://github.com/apple/swift-evolution/blob/master/proposals/0155-normalize-enum-case-representation.md is shipping in Swift
 		case circle(radius: Double, color: NSColor)
+		case badge(color: NSColor, badgeLabel: String)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
@@ -58,6 +59,8 @@ public final class DockProgress {
 				self.drawProgressBar(dstRect)
 			case let .circle(radius, color):
 				self.drawProgressCircle(dstRect, radius: radius, color: color)
+			case let .badge(color, badgeLabel):
+				self.drawProgressBadge(dstRect, badgeLabel: badgeLabel, color: color)
 			case let .custom(drawingHandler):
 				drawingHandler(dstRect)
 			}
@@ -93,6 +96,37 @@ public final class DockProgress {
 		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
+		progressCircle.cornerRadius = 3
+		progressCircle.progress = progressValue
+		progressCircle.render(in: cgContext)
+	}
+	
+	private static func drawProgressBadge(_ dstRect: CGRect, badgeLabel: String, color: NSColor) {
+		
+		guard let cgContext = NSGraphicsContext.current?.cgContext else {
+			return
+		}
+		
+		let radius = CGFloat(dstRect.width/4.5)
+		let newCenter = CGPoint(x: dstRect.maxX - radius - 4, y: dstRect.minY + radius + 4)
+		let progressCircle = ProgressCircleShapeLayer(radius: Double(radius), center: newCenter)
+		
+		// setup badge label
+		let textLayer = VerticallyCenteredTextLayer()
+		textLayer.foregroundColor = CGColor(red:0.23,green:0.23,blue:0.24,alpha:1.00)
+		let dimension = progressCircle.bounds.height - 5
+		textLayer.frame = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
+		textLayer.frame.center = newCenter
+		textLayer.alignmentMode = .center
+		textLayer.truncationMode = .end
+		textLayer.fontSize = 27
+		textLayer.string = badgeLabel
+		textLayer.contentsScale = NSScreen.main!.backingScaleFactor
+		
+		progressCircle.addSublayer(textLayer)
+		progressCircle.strokeColor = color.cgColor
+		progressCircle.fillColor = CGColor(red:0.94, green:0.96, blue:1.00, alpha:1.00)
+		progressCircle.lineWidth = 7
 		progressCircle.cornerRadius = 3
 		progressCircle.progress = progressValue
 		progressCircle.render(in: cgContext)
