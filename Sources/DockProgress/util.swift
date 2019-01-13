@@ -47,7 +47,7 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		}
 		strokeEnd = 0
 	}
-	
+
 	var progress: Double {
 		get {
 			return Double(strokeEnd)
