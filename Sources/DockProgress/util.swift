@@ -110,8 +110,18 @@ extension NSBezierPath {
 	}
 }
 
-class VerticallyCenteredTextLayer : CATextLayer {
-	
+final class VerticallyCenteredTextLayer: CATextLayer {
+
+	convenience init(frame rect: CGRect, center: CGPoint) {
+		self.init()
+		frame = rect
+		frame.center = center
+		alignmentMode = .center
+		truncationMode = .end
+		fontSize = 27
+		contentsScale = NSScreen.main!.backingScaleFactor
+	}
+
 	// REF: https://stackoverflow.com/a/44055040/6863743
 	// CREDIT: David Hoerl - https://github.com/dhoerl
 	// USAGE: To fix the vertical alignment issue that currently exists within the CATextLayer class.
@@ -119,7 +129,7 @@ class VerticallyCenteredTextLayer : CATextLayer {
 		let fontSize = self.fontSize
 		let height = self.bounds.size.height
 		let deltaY = ((height-fontSize)/2 - fontSize/10) * -1
-		
+
 		ctx.saveGState()
 		ctx.translateBy(x: 0.0, y: deltaY)
 		super.draw(in: ctx)
