@@ -132,7 +132,7 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 
 		context.saveGState()
 		context.translateBy(x: 0, y: deltaY)
-		super.draw(in: ctx)
+		super.draw(in: context)
 		context.restoreGState()
 	}
 }
