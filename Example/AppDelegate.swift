@@ -12,9 +12,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		borrowIconFrom(app: "Photos")
 
-		let styles = [DockProgress.ProgressStyle.bar,
-					  DockProgress.ProgressStyle.circle(radius: 58, color: .systemPink),
-					  DockProgress.ProgressStyle.badge(color: .systemBlue, badgeLabel: "1")]
+		let styles: [DockProgress.ProgressStyle] = [
+			.bar,
+			.circle(radius: 58, color: .systemPink),
+			.badge(color: .systemBlue, badgeLabel: "0")
+		]
 
 		var stylesIterator = styles.makeIterator()
 		let _ = stylesIterator.next()
@@ -23,12 +25,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			DockProgress.progressValue += 0.01
 
 			if DockProgress.progressValue > 1 {
-
 				if let style = stylesIterator.next() {
 					DockProgress.progressValue = 0
 					DockProgress.style = style
 				} else {
-					// reset iterator when all is looped
+					// Reset iterator when all is looped
 					stylesIterator = styles.makeIterator()
 				}
 			}
