@@ -102,7 +102,6 @@ public final class DockProgress {
 	}
 	
 	private static func drawProgressBadge(_ dstRect: CGRect, badgeLabel: String, color: NSColor) {
-
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
 		}
@@ -110,11 +109,11 @@ public final class DockProgress {
 		let radius = dstRect.width / 4.5
 		let newCenter = CGPoint(x: dstRect.maxX - radius - 4, y: dstRect.minY + radius + 4)
 
-		// background
+		// Background
 		let badge = ProgressCircleShapeLayer(radius: Double(radius), center: newCenter)
-		badge.fillColor = CGColor(red: 0.94, green: 0.96, blue: 1.00, alpha: 1.00)
+		badge.fillColor = CGColor(red: 0.94, green: 0.96, blue: 1, alpha: 1)
 
-		// progress circle
+		// Progress circle
 		let lineWidth: CGFloat = 6
 		let progressCircle = ProgressCircleShapeLayer(radius: Double(radius) - Double(lineWidth / 2), center: newCenter)
 		progressCircle.strokeColor = color.cgColor
@@ -122,11 +121,11 @@ public final class DockProgress {
 		progressCircle.lineCap = .square
 		progressCircle.progress = progressValue
 
-		// label
+		// Label
 		let dimension = badge.bounds.height - 5
 		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
 		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
-		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1.00)
+		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
 		textLayer.string = badgeLabel
 
 		badge.addSublayer(textLayer)
