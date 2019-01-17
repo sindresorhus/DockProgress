@@ -66,6 +66,9 @@ extension NSColor {
 	}
 }
 
+extension NSFont {
+	static let helveticaNeueBold = NSFont(name: "HelveticaNeue-Bold", size: 0)
+}
 
 extension CGRect {
 	var center: CGPoint {
@@ -116,11 +119,6 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		self.init()
 		frame = rect
 		frame.center = center
-		alignmentMode = .center
-		truncationMode = .end
-		font = NSFont(name: "HelveticaNeue-Bold", size: 0)
-		fontSize = 25
-		contentsScale = NSScreen.main!.backingScaleFactor
 	}
 
 	// REF: https://stackoverflow.com/a/44055040/6863743

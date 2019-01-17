@@ -106,7 +106,7 @@ public final class DockProgress {
 			return
 		}
 
-		let radius = dstRect.width / 4.5
+		let radius = dstRect.width / 4.8
 		let newCenter = CGPoint(x: dstRect.maxX - radius - 4, y: dstRect.minY + radius + 4)
 
 		// Background
@@ -115,7 +115,8 @@ public final class DockProgress {
 
 		// Progress circle
 		let lineWidth: CGFloat = 6
-		let progressCircle = ProgressCircleShapeLayer(radius: Double(radius) - Double(lineWidth / 2), center: newCenter)
+		let innerRadius = Double(radius) - Double(lineWidth / 2)
+		let progressCircle = ProgressCircleShapeLayer(radius: innerRadius, center: newCenter)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .square
@@ -127,6 +128,11 @@ public final class DockProgress {
 		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
 		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
 		textLayer.string = badgeLabel
+		textLayer.alignmentMode = .center
+		textLayer.truncationMode = .end
+		textLayer.font = NSFont.helveticaNeueBold
+		textLayer.fontSize = 23
+		textLayer.contentsScale = NSScreen.main?.backingScaleFactor ?? 2
 
 		badge.addSublayer(textLayer)
 		badge.addSublayer(progressCircle)
