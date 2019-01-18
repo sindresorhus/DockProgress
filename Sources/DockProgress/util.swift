@@ -119,6 +119,7 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		self.init()
 		frame = rect
 		frame.center = center
+		contentsScale = NSScreen.main?.backingScaleFactor ?? 2
 	}
 
 	// REF: https://stackoverflow.com/a/44055040/6863743

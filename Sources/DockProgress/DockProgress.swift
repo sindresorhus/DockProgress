@@ -112,6 +112,11 @@ public final class DockProgress {
 		// Background
 		let badge = ProgressCircleShapeLayer(radius: Double(radius), center: newCenter)
 		badge.fillColor = CGColor(red: 0.94, green: 0.96, blue: 1, alpha: 1)
+		badge.shadowColor = .black
+		badge.shadowOpacity = 0.3
+		badge.masksToBounds = false
+		badge.shadowOffset = CGSize(width: -1, height: 1)
+		badge.shadowPath = badge.path
 
 		// Progress circle
 		let lineWidth: CGFloat = 6
@@ -132,7 +137,6 @@ public final class DockProgress {
 		textLayer.truncationMode = .end
 		textLayer.font = NSFont.helveticaNeueBold
 		textLayer.fontSize = 23
-		textLayer.contentsScale = NSScreen.main?.backingScaleFactor ?? 2
 
 		badge.addSublayer(textLayer)
 		badge.addSublayer(progressCircle)
