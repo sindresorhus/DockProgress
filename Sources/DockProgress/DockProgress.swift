@@ -32,7 +32,7 @@ public final class DockProgress {
 		case bar
 		/// TODO: Make `color` optional when https://github.com/apple/swift-evolution/blob/master/proposals/0155-normalize-enum-case-representation.md is shipping in Swift
 		case circle(radius: Double, color: NSColor)
-		case badge(color: NSColor, badgeLabel: String)
+		case badge(color: NSColor, badgeValue: () -> Int)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
@@ -59,8 +59,8 @@ public final class DockProgress {
 				self.drawProgressBar(dstRect)
 			case let .circle(radius, color):
 				self.drawProgressCircle(dstRect, radius: radius, color: color)
-			case let .badge(color, badgeLabel):
-				self.drawProgressBadge(dstRect, badgeLabel: badgeLabel, color: color)
+			case let .badge(color, badgeValue):
+				self.drawProgressBadge(dstRect, badgeLabel: badgeValue(), color: color)
 			case let .custom(drawingHandler):
 				drawingHandler(dstRect)
 			}
@@ -101,7 +101,7 @@ public final class DockProgress {
 		progressCircle.render(in: cgContext)
 	}
 	
-	private static func drawProgressBadge(_ dstRect: CGRect, badgeLabel: String, color: NSColor) {
+	private static func drawProgressBadge(_ dstRect: CGRect, badgeLabel: Int, color: NSColor) {
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
 		}
@@ -132,7 +132,7 @@ public final class DockProgress {
 		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
 		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
 		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
-		textLayer.string = badgeLabel
+		textLayer.string = "\(badgeLabel)"
 		textLayer.alignmentMode = .center
 		textLayer.truncationMode = .end
 		textLayer.font = NSFont.helveticaNeueBold

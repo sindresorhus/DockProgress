@@ -15,7 +15,9 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		let styles: [DockProgress.ProgressStyle] = [
 			.bar,
 			.circle(radius: 58, color: .systemPink),
-			.badge(color: .systemBlue, badgeLabel: "0")
+			.badge(color: .systemBlue, badgeValue: {
+				return Int(DockProgress.progressValue * 100)
+			})
 		]
 
 		var stylesIterator = styles.makeIterator()
