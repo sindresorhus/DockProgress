@@ -60,7 +60,7 @@ public final class DockProgress {
 			case let .circle(radius, color):
 				self.drawProgressCircle(dstRect, radius: radius, color: color)
 			case let .badge(color, badgeValue):
-				self.drawProgressBadge(dstRect, badgeLabel: badgeValue(), color: color)
+				self.drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
 			case let .custom(drawingHandler):
 				drawingHandler(dstRect)
 			}
@@ -101,7 +101,7 @@ public final class DockProgress {
 		progressCircle.render(in: cgContext)
 	}
 	
-	private static func drawProgressBadge(_ dstRect: CGRect, badgeLabel: Int, color: NSColor) {
+	private static func drawProgressBadge(_ dstRect: CGRect, color: NSColor, badgeLabel: Int) {
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
 		}
