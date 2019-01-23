@@ -59,6 +59,28 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 	}
 }
 
+extension Int {
+	/**
+	```
+	999 => 999
+	1000 => 1K
+	1100 => 1K
+	2000 => 2K
+	10000 => 9K+
+	```
+	*/
+	var shortStringRepresentation: String {
+		let signum = self.signum()
+		let number = abs(self)
+		if number < 1000 {
+			return "\(self)"
+		} else if number < 10000 {
+			return "\(signum * Int(number/1000))K"
+		} else {
+			return "\(signum * 9)K+"
+		}
+	}
+}
 
 extension NSColor {
 	func with(alpha: Double) -> NSColor {
@@ -133,5 +155,19 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		context.translateBy(x: 0, y: deltaY)
 		super.draw(in: context)
 		context.restoreGState()
+	}
+
+	var dynamicFontSizeForBadge: CGFloat {
+		var charCount = 0
+		if let string = self.string as? NSString {
+			charCount = string.length
+		}
+		switch charCount {
+		case 1: return 30.0
+		case 2: return 23.0
+		case 3: return 20.0
+		case 4: return 15.0
+		default: return 0.0
+		}
 	}
 }

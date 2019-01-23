@@ -132,11 +132,11 @@ public final class DockProgress {
 		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
 		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
 		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
-		textLayer.string = "\(badgeLabel)"
+		textLayer.string = badgeLabel.shortStringRepresentation
 		textLayer.alignmentMode = .center
 		textLayer.truncationMode = .end
 		textLayer.font = NSFont.helveticaNeueBold
-		textLayer.fontSize = 23
+		textLayer.fontSize = textLayer.dynamicFontSizeForBadge
 
 		badge.addSublayer(textLayer)
 		badge.addSublayer(progressCircle)
