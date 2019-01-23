@@ -124,7 +124,7 @@ public final class DockProgress {
 		let progressCircle = ProgressCircleShapeLayer(radius: innerRadius, center: newCenter)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
-		progressCircle.lineCap = .square
+		progressCircle.lineCap = .butt
 		progressCircle.progress = progressValue
 
 		// Label
