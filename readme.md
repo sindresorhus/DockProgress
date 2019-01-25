@@ -94,6 +94,7 @@ import DockProgress
 
 DockProgress.style = .circle(radius: 55, color: .systemBlue)
 ```
+
 Make sure to set a `radius` that matches your app icon.
 
 ### Badge
@@ -103,9 +104,12 @@ Make sure to set a `radius` that matches your app icon.
 ```swift
 import DockProgress
 
-DockProgress.style = .badge(color: .systemBlue, badgeValue: { Int(DockProgress.progressValue * 100) })
+DockProgress.style = .badge(color: .systemBlue, badgeValue: { getDownloadCount() })
 ```
-Large `badgeValue` numbers will be written in kilo short notation (e.g. 1000 -> 1k).
+
+Large `badgeValue` numbers will be written in kilo short notation, for example, `1000` → `1k`.
+
+Note: The `badgeValue` is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
 
 
 ## Related
