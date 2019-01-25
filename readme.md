@@ -94,8 +94,18 @@ import DockProgress
 
 DockProgress.style = .circle(radius: 55, color: .systemBlue)
 ```
-
 Make sure to set a `radius` that matches your app icon.
+
+### Badge
+
+![](screenshot-badge.gif)
+
+```swift
+import DockProgress
+
+DockProgress.style = .badge(color: .systemBlue, badgeValue: { Int(DockProgress.progressValue * 100) })
+```
+Large `badgeValue` numbers will be written in kilo short notation (e.g. 1000 -> 1k).
 
 
 ## Related

@@ -167,9 +167,7 @@ public final class DockProgress {
 	}
 
 	private static func scaledBadgeFontSize(text: String) -> CGFloat {
-		let charCount = text.count
-
-		switch charCount {
+		switch text.count {
 		case 1:
 			return 30.0
 		case 2:
