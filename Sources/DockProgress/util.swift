@@ -42,11 +42,11 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		fillColor = nil
 		lineCap = .round
 		position = center
-		path = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
-		if let boundingBox = path?.boundingBox {
-			bounds = boundingBox
-		}
 		strokeEnd = 0
+
+		let cgPath = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
+		path = cgPath
+		bounds = cgPath.boundingBox
 	}
 
 	var progress: Double {
@@ -55,30 +55,6 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		}
 		set {
 			strokeEnd = CGFloat(newValue)
-		}
-	}
-}
-
-extension Int {
-	/**
-	```
-	999 => 999
-	1000 => 1K
-	1100 => 1K
-	2000 => 2K
-	10000 => 9K+
-	```
-	*/
-	var shortStringRepresentation: String {
-		let sign = signum()
-		let number = abs(self)
-
-		if number < 1000 {
-			return "\(self)"
-		} else if number < 10000 {
-			return "\(sign * Int(number / 1000))K"
-		} else {
-			return "\(sign * 9)K+"
 		}
 	}
 }
@@ -156,25 +132,5 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		context.translateBy(x: 0, y: deltaY)
 		super.draw(in: context)
 		context.restoreGState()
-	}
-
-	var dynamicFontSizeForBadge: CGFloat {
-		var charCount = 0
-		if let string = self.string as? NSString {
-			charCount = string.length
-		}
-
-		switch charCount {
-		case 1:
-			return 30.0
-		case 2:
-			return 23.0
-		case 3:
-			return 20.0
-		case 4:
-			return 15.0
-		default:
-			return 0.0
-		}
 	}
 }

@@ -120,8 +120,8 @@ public final class DockProgress {
 
 		// Progress circle
 		let lineWidth: CGFloat = 6
-		let innerRadius = Double(radius) - Double(lineWidth / 2)
-		let progressCircle = ProgressCircleShapeLayer(radius: innerRadius, center: newCenter)
+		let innerRadius = radius - lineWidth / 2
+		let progressCircle = ProgressCircleShapeLayer(radius: Double(innerRadius), center: newCenter)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
@@ -131,15 +131,56 @@ public final class DockProgress {
 		let dimension = badge.bounds.height - 5
 		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
 		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
+		let badgeText = kiloShortStringFromInt(number: badgeLabel)
+		print(badgeText)
 		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
-		textLayer.string = badgeLabel.shortStringRepresentation
+		textLayer.string = badgeText
+		textLayer.fontSize = scaledBadgeFontSize(text: badgeText)
+		textLayer.font = NSFont.helveticaNeueBold
 		textLayer.alignmentMode = .center
 		textLayer.truncationMode = .end
-		textLayer.font = NSFont.helveticaNeueBold
-		textLayer.fontSize = textLayer.dynamicFontSizeForBadge
 
 		badge.addSublayer(textLayer)
 		badge.addSublayer(progressCircle)
 		badge.render(in: cgContext)
+	}
+
+	/**
+	```
+	999 => 999
+	1000 => 1K
+	1100 => 1K
+	2000 => 2K
+	10000 => 9K+
+	```
+	*/
+	private static func kiloShortStringFromInt(number: Int) -> String {
+		let sign = number.signum()
+		let absNumber = abs(number)
+
+		if absNumber < 1000 {
+			return "\(number)"
+		} else if absNumber < 10000 {
+			return "\(sign * Int(absNumber / 1000))k"
+		} else {
+			return "\(sign * 9)k+"
+		}
+	}
+
+	private static func scaledBadgeFontSize(text: String) -> CGFloat {
+		let charCount = text.count
+
+		switch charCount {
+		case 1:
+			return 30.0
+		case 2:
+			return 23.0
+		case 3:
+			return 19.0
+		case 4:
+			return 15.0
+		default:
+			return 0.0
+		}
 	}
 }
