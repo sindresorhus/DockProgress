@@ -70,14 +70,15 @@ extension Int {
 	```
 	*/
 	var shortStringRepresentation: String {
-		let signum = self.signum()
+		let sign = signum()
 		let number = abs(self)
+
 		if number < 1000 {
 			return "\(self)"
 		} else if number < 10000 {
-			return "\(signum * Int(number/1000))K"
+			return "\(sign * Int(number / 1000))K"
 		} else {
-			return "\(signum * 9)K+"
+			return "\(sign * 9)K+"
 		}
 	}
 }
@@ -162,12 +163,18 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		if let string = self.string as? NSString {
 			charCount = string.length
 		}
+
 		switch charCount {
-		case 1: return 30.0
-		case 2: return 23.0
-		case 3: return 20.0
-		case 4: return 15.0
-		default: return 0.0
+		case 1:
+			return 30.0
+		case 2:
+			return 23.0
+		case 3:
+			return 20.0
+		case 4:
+			return 15.0
+		default:
+			return 0.0
 		}
 	}
 }
