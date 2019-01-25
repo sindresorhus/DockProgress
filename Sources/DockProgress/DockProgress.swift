@@ -28,6 +28,13 @@ public final class DockProgress {
 		}
 	}
 
+	/// Reset the `progressValue` without animating
+	public static func resetProgress() {
+		progressValue = 0
+		previousProgressValue = 0
+		updateDockIcon()
+	}
+
 	public enum ProgressStyle {
 		case bar
 		/// TODO: Make `color` optional when https://github.com/apple/swift-evolution/blob/master/proposals/0155-normalize-enum-case-representation.md is shipping in Swift
