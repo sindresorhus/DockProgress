@@ -19,14 +19,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		]
 
 		var stylesIterator = styles.makeIterator()
-		let _ = stylesIterator.next()
+		_ = stylesIterator.next()
 
 		Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
 			DockProgress.progressValue += 0.01
 
 			if DockProgress.progressValue > 1 {
 				if let style = stylesIterator.next() {
-					DockProgress.progressValue = 0
+					DockProgress.resetProgress()
 					DockProgress.style = style
 				} else {
 					// Reset iterator when all is looped

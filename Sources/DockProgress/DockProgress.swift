@@ -107,7 +107,7 @@ public final class DockProgress {
 		progressCircle.progress = progressValue
 		progressCircle.render(in: cgContext)
 	}
-	
+
 	private static func drawProgressBadge(_ dstRect: CGRect, color: NSColor, badgeLabel: Int) {
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
@@ -166,7 +166,7 @@ public final class DockProgress {
 
 		if absNumber < 1000 {
 			return "\(number)"
-		} else if absNumber < 10000 {
+		} else if absNumber < 10_000 {
 			return "\(sign * Int(absNumber / 1000))k"
 		} else {
 			return "\(sign * 9)k+"
