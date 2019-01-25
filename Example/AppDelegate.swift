@@ -12,14 +12,26 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 	func applicationDidFinishLaunching(_ notification: Notification) {
 		borrowIconFrom(app: "Photos")
 
-		var lastStyleWasBar = true
+		let styles: [DockProgress.ProgressStyle] = [
+			.bar,
+			.circle(radius: 58, color: .systemPink),
+			.badge(color: .systemBlue, badgeValue: { Int(DockProgress.progressValue * 12) })
+		]
+
+		var stylesIterator = styles.makeIterator()
+		let _ = stylesIterator.next()
+
 		Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
 			DockProgress.progressValue += 0.01
 
 			if DockProgress.progressValue > 1 {
-				DockProgress.progressValue = 0
-				DockProgress.style = lastStyleWasBar ? .circle(radius: 58, color: .systemPink) : .bar
-				lastStyleWasBar = !lastStyleWasBar
+				if let style = stylesIterator.next() {
+					DockProgress.progressValue = 0
+					DockProgress.style = style
+				} else {
+					// Reset iterator when all is looped
+					stylesIterator = styles.makeIterator()
+				}
 			}
 		}
 	}

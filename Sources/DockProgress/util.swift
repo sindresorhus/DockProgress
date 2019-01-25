@@ -41,8 +41,12 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		self.init()
 		fillColor = nil
 		lineCap = .round
-		path = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
+		position = center
 		strokeEnd = 0
+
+		let cgPath = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
+		path = cgPath
+		bounds = cgPath.boundingBox
 	}
 
 	var progress: Double {
@@ -55,13 +59,15 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 	}
 }
 
-
 extension NSColor {
 	func with(alpha: Double) -> NSColor {
 		return withAlphaComponent(CGFloat(alpha))
 	}
 }
 
+extension NSFont {
+	static let helveticaNeueBold = NSFont(name: "HelveticaNeue-Bold", size: 0)
+}
 
 extension CGRect {
 	var center: CGPoint {
@@ -104,5 +110,26 @@ extension NSBezierPath {
 	/// UIKit polyfill
 	convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat) {
 		self.init(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
+	}
+}
+
+/// Fixes the vertical alignment issue of the `CATextLayer` class.
+final class VerticallyCenteredTextLayer: CATextLayer {
+	convenience init(frame rect: CGRect, center: CGPoint) {
+		self.init()
+		frame = rect
+		frame.center = center
+		contentsScale = NSScreen.main?.backingScaleFactor ?? 2
+	}
+
+	// From https://stackoverflow.com/a/44055040/6863743
+	override func draw(in context: CGContext) {
+		let height = bounds.size.height
+		let deltaY = ((height - fontSize) / 2 - fontSize / 10) * -1
+
+		context.saveGState()
+		context.translateBy(x: 0, y: deltaY)
+		super.draw(in: context)
+		context.restoreGState()
 	}
 }
