@@ -124,7 +124,7 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 
 	// From https://stackoverflow.com/a/44055040/6863743
 	override func draw(in context: CGContext) {
-		let height = self.bounds.size.height
+		let height = bounds.size.height
 		let deltaY = ((height - fontSize) / 2 - fontSize / 10) * -1
 
 		context.saveGState()
