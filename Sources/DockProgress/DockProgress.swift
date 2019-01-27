@@ -9,10 +9,10 @@ public final class DockProgress {
 		NSApp.dockTile.contentView = $0
 	}
 
-	public static var progress: Progress? {
+	public static var progressInstance: Progress? {
 		didSet {
-			if let progress = progress {
-				progressObserver = progress.observe(\.fractionCompleted) { sender, _ in
+			if let progressInstance = progressInstance {
+				progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
 					progressValue = sender.fractionCompleted
 				}
 			}
