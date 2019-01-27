@@ -59,15 +59,18 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 	}
 }
 
+
 extension NSColor {
 	func with(alpha: Double) -> NSColor {
 		return withAlphaComponent(CGFloat(alpha))
 	}
 }
 
+
 extension NSFont {
 	static let helveticaNeueBold = NSFont(name: "HelveticaNeue-Bold", size: 0)
 }
+
 
 extension CGRect {
 	var center: CGPoint {
@@ -112,6 +115,7 @@ extension NSBezierPath {
 		self.init(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
 	}
 }
+
 
 /// Fixes the vertical alignment issue of the `CATextLayer` class.
 final class VerticallyCenteredTextLayer: CATextLayer {

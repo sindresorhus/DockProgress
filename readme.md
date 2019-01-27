@@ -47,8 +47,8 @@ pod 'DockProgress'
 import Cocoa
 import DockProgress
 
-foo.onUpdate = { progress in
-	DockProgress.progressValue = progress
+foo.onUpdate = { progressValue in
+	DockProgress.progressValue = progressValue
 }
 ```
 
@@ -67,7 +67,7 @@ DockProgress.progress = progress
 
 ## Styles
 
-It comes with two styles. PR welcome for more.
+It comes with three styles. PR welcome for more.
 
 Check out the example app in the Xcode project.
 
@@ -107,7 +107,7 @@ import DockProgress
 DockProgress.style = .badge(color: .systemBlue, badgeValue: { getDownloadCount() })
 ```
 
-Large `badgeValue` numbers will be written in kilo short notation, for example, `1000` → `1k`.
+Large `badgeValue` numbers will be written in kilo short notation, for example, `1012` → `1k`.
 
 Note: The `badgeValue` is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
 
