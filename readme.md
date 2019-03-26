@@ -61,7 +61,7 @@ import DockProgress
 let progress = Progress(totalUnitCount: 1)
 progress?.becomeCurrent(withPendingUnitCount: 1)
 
-DockProgress.progress = progress
+DockProgress.progressInstance = progress
 ```
 
 
