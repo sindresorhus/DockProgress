@@ -15,16 +15,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 		let styles: [DockProgress.ProgressStyle] = [
 			.bar,
 			.circle(radius: 58, color: .systemPink),
-			.badge(color: .systemBlue, badgeValue: { Int(DockProgress.progressValue * 12) })
+			.badge(color: .systemBlue, badgeValue: { Int(DockProgress.progress * 12) })
 		]
 
 		var stylesIterator = styles.makeIterator()
 		_ = stylesIterator.next()
 
 		Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
-			DockProgress.progressValue += 0.01
+			DockProgress.progress += 0.01
 
-			if DockProgress.progressValue > 1 {
+			if DockProgress.progress > 1 {
 				if let style = stylesIterator.next() {
 					DockProgress.resetProgress()
 					DockProgress.style = style

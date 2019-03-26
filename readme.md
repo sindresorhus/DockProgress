@@ -47,12 +47,12 @@ pod 'DockProgress'
 import Cocoa
 import DockProgress
 
-foo.onUpdate = { progressValue in
-	DockProgress.progressValue = progressValue
+foo.onUpdate = { progress in
+	DockProgress.progress = progress
 }
 ```
 
-### Specify a [`Progress`](https://developer.apple.com/documentation/foundation/progress) instance
+### Specify a [`Progress` instance](https://developer.apple.com/documentation/foundation/progress)
 
 ```swift
 import Cocoa

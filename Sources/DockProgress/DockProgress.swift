@@ -2,7 +2,7 @@ import Cocoa
 
 public final class DockProgress {
 	private static let appIcon = NSApp.applicationIconImage!
-	private static var previousProgressValue: Double = 0
+	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
 
 	private static var dockImageView = with(NSImageView()) {
@@ -13,25 +13,25 @@ public final class DockProgress {
 		didSet {
 			if let progressInstance = progressInstance {
 				progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
-					progressValue = sender.fractionCompleted
+					progress = sender.fractionCompleted
 				}
 			}
 		}
 	}
 
-	public static var progressValue: Double = 0 {
+	public static var progress: Double = 0 {
 		didSet {
-			if previousProgressValue == 0 || (progressValue - previousProgressValue).magnitude > 0.01 {
-				previousProgressValue = progressValue
+			if previousProgress == 0 || (progress - previousProgress).magnitude > 0.01 {
+				previousProgress = progress
 				updateDockIcon()
 			}
 		}
 	}
 
-	/// Reset the `progressValue` without animating
+	/// Reset the `progress` without animating
 	public static func resetProgress() {
-		progressValue = 0
-		previousProgressValue = 0
+		progress = 0
+		previousProgress = 0
 		updateDockIcon()
 	}
 
@@ -47,8 +47,8 @@ public final class DockProgress {
 
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
-		// TODO: If the `progressValue` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-		let icon = (0..<1).contains(progressValue) ? draw() : appIcon
+		// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
+		let icon = (0..<1).contains(progress) ? draw() : appIcon
 		DispatchQueue.main.async {
 			// TODO: Make this better by drawing in the `contentView` directly instead of using an image
 			dockImageView.image = icon
@@ -90,7 +90,7 @@ public final class DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * CGFloat(progressValue)
+		barProgress.size.width = barProgress.width * CGFloat(progress)
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}
@@ -104,7 +104,7 @@ public final class DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
 		progressCircle.cornerRadius = 3
-		progressCircle.progress = progressValue
+		progressCircle.progress = progress
 		progressCircle.render(in: cgContext)
 	}
 
@@ -132,7 +132,7 @@ public final class DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
-		progressCircle.progress = progressValue
+		progressCircle.progress = progress
 
 		// Label
 		let dimension = badge.bounds.height - 5
