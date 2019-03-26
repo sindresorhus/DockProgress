@@ -21,9 +21,10 @@ func with<T>(_ item: T, update: (inout T) throws -> Void) rethrows -> T {
 
 
 extension NSBezierPath {
-	static func progressCircle(radius: Double, center: CGPoint) -> NSBezierPath {
+	/// For making a circle progress indicator
+	static func progressCircle(radius: Double, center: CGPoint) -> Self {
 		let startAngle: CGFloat = 90
-		let path = NSBezierPath()
+		let path = self.init()
 		path.appendArc(
 			withCenter: center,
 			radius: CGFloat(radius),
@@ -93,8 +94,8 @@ extension NSBezierPath {
 		let path = CGMutablePath()
 		var points = [CGPoint](repeating: .zero, count: 3)
 
-		for i in 0..<elementCount {
-			let type = element(at: i, associatedPoints: &points)
+		for index in 0..<elementCount {
+			let type = element(at: index, associatedPoints: &points)
 			switch type {
 			case .moveTo:
 				path.move(to: points[0])
@@ -104,6 +105,8 @@ extension NSBezierPath {
 				path.addCurve(to: points[2], control1: points[0], control2: points[1])
 			case .closePath:
 				path.closeSubpath()
+			@unknown default:
+				assertionFailure("NSBezierPath received a new enum case. Please handle it.")
 			}
 		}
 
