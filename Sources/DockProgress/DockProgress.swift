@@ -4,6 +4,8 @@ public final class DockProgress {
 	private static let appIcon = NSApp.applicationIconImage!
 	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
+	static var stepDuration: Double = 0.05
+	static var totalSteps: Double = 30
 
 	private static var dockImageView = with(NSImageView()) {
 		NSApp.dockTile.contentView = $0
@@ -21,8 +23,34 @@ public final class DockProgress {
 
 	public static var progress: Double = 0 {
 		didSet {
+			// previousProgress == 0 ||
+			if (progress - previousProgress).magnitude > 0.01 {
+				let difference = progress - previousProgress
+				let steps = Int(totalSteps * difference.magnitude)
+				if steps == 0 {
+					return
+				}
+
+				for ii in (1 ... steps) {
+					let step = difference / Double(steps)
+					DispatchQueue.main.asyncAfter(deadline: .now() + (stepDuration * Double(ii))) {
+						animatedProgress += step
+					}
+				}
+			}
+		}
+	}
+
+	private static var animatedProgress: Double = 0 {
+		didSet {
+			if animatedProgress > 1 || animatedProgress < 0 {
+				animatedProgress = 0
+				previousProgress = 0
+				progress = 0
+				return
+			}
 			if previousProgress == 0 || (progress - previousProgress).magnitude > 0.01 {
-				previousProgress = progress
+				previousProgress = animatedProgress
 				updateDockIcon()
 			}
 		}
@@ -32,6 +60,7 @@ public final class DockProgress {
 	public static func resetProgress() {
 		progress = 0
 		previousProgress = 0
+		animatedProgress = 0
 		updateDockIcon()
 	}
 
@@ -45,10 +74,9 @@ public final class DockProgress {
 
 	public static var style: ProgressStyle = .bar
 
-	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
 		// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-		let icon = (0..<1).contains(progress) ? draw() : appIcon
+		let icon = (0..<1).contains(animatedProgress) ? draw() : appIcon
 		DispatchQueue.main.async {
 			// TODO: Make this better by drawing in the `contentView` directly instead of using an image
 			dockImageView.image = icon
@@ -90,7 +118,7 @@ public final class DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * CGFloat(progress)
+		barProgress.size.width = barProgress.width * CGFloat(animatedProgress)
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}
@@ -104,7 +132,7 @@ public final class DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
 		progressCircle.cornerRadius = 3
-		progressCircle.progress = progress
+		progressCircle.progress = animatedProgress
 		progressCircle.render(in: cgContext)
 	}
 
@@ -132,7 +160,7 @@ public final class DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
-		progressCircle.progress = progress
+		progressCircle.progress = animatedProgress
 
 		// Label
 		let dimension = badge.bounds.height - 5
