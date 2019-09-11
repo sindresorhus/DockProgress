@@ -4,14 +4,14 @@
 
 <img src="screenshot.gif" width="485">
 
-This package is used in production by the [Gifski app](https://github.com/sindresorhus/gifski-app). You might also like some of my [other apps](https://sindresorhus.com/apps).
+This package is used in production by the [Gifski app](https://github.com/sindresorhus/Gifski). You might also like some of my [other apps](https://sindresorhus.com/apps).
 
 
 ## Requirements
 
 - macOS 10.12+
 - Xcode 10.2+
-- Swift 5+
+- Swift 5.1+
 
 
 ## Install
@@ -114,8 +114,3 @@ Note: The `badgeValue` is not meant to be used as a numeric percentage. It's for
 - [Preferences](https://github.com/sindresorhus/Preferences) - Add a preferences window to your macOS app in minutes
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
 - [More…](https://github.com/search?q=user%3Asindresorhus+language%3Aswift)
-
-
-## License
-
-MIT © [Sindre Sorhus](https://sindresorhus.com)

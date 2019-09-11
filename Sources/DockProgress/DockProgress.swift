@@ -4,6 +4,7 @@ public final class DockProgress {
 	private static let appIcon = NSApp.applicationIconImage!
 	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
+	private static var finishedObserver: NSKeyValueObservation?
 
 	private static var dockImageView = with(NSImageView()) {
 		NSApp.dockTile.contentView = $0
@@ -13,7 +14,19 @@ public final class DockProgress {
 		didSet {
 			if let progressInstance = progressInstance {
 				progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
+					guard !sender.isCancelled && !sender.isFinished else {
+						return
+					}
+
 					progress = sender.fractionCompleted
+				}
+
+				finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
+					guard !sender.isCancelled && sender.isFinished else {
+						return
+					}
+
+					progress = 1
 				}
 			}
 		}
@@ -28,7 +41,7 @@ public final class DockProgress {
 		}
 	}
 
-	/// Reset the `progress` without animating
+	/// Reset the `progress` without animating.
 	public static func resetProgress() {
 		progress = 0
 		previousProgress = 0
@@ -37,9 +50,8 @@ public final class DockProgress {
 
 	public enum ProgressStyle {
 		case bar
-		// TODO: Make `color` optional when https://github.com/apple/swift-evolution/blob/master/proposals/0155-normalize-enum-case-representation.md is shipping in Swift
-		case circle(radius: Double, color: NSColor)
-		case badge(color: NSColor, badgeValue: () -> Int)
+		case circle(radius: Double, color: NSColor = .controlAccentColorPolyfill)
+		case badge(color: NSColor = .controlAccentColorPolyfill, badgeValue: () -> Int)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
@@ -48,8 +60,8 @@ public final class DockProgress {
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
 		// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-		let icon = (0..<1).contains(progress) ? draw() : appIcon
 		DispatchQueue.main.async {
+			let icon = (0..<1).contains(progress) ? draw() : appIcon
 			// TODO: Make this better by drawing in the `contentView` directly instead of using an image
 			dockImageView.image = icon
 			NSApp.dockTile.display()
@@ -82,11 +94,11 @@ public final class DockProgress {
 		}
 
 		let bar = CGRect(x: 0, y: 20, width: dstRect.width, height: 10)
-		NSColor.white.with(alpha: 0.8).set()
+		NSColor.white.withAlpha(0.8).set()
 		roundedRect(bar)
 
 		let barInnerBg = bar.insetBy(dx: 0.5, dy: 0.5)
-		NSColor.black.with(alpha: 0.8).set()
+		NSColor.black.withAlpha(0.8).set()
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)

@@ -2,7 +2,7 @@ import Cocoa
 
 
 /**
-Convenience function for initializing an object and modifying its properties
+Convenience function for initializing an object and modifying its properties.
 
 ```
 let label = with(NSTextField()) {
@@ -21,7 +21,7 @@ func with<T>(_ item: T, update: (inout T) throws -> Void) rethrows -> T {
 
 
 extension NSBezierPath {
-	/// For making a circle progress indicator
+	/// For making a circle progress indicator.
 	static func progressCircle(radius: Double, center: CGPoint) -> Self {
 		let startAngle: CGFloat = 90
 		let path = self.init()
@@ -51,9 +51,7 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 	}
 
 	var progress: Double {
-		get {
-			return Double(strokeEnd)
-		}
+		get { Double(strokeEnd) }
 		set {
 			strokeEnd = CGFloat(newValue)
 		}
@@ -62,8 +60,8 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 
 
 extension NSColor {
-	func with(alpha: Double) -> NSColor {
-		return withAlphaComponent(CGFloat(alpha))
+	func withAlpha(_ alpha: Double) -> NSColor {
+		withAlphaComponent(CGFloat(alpha))
 	}
 }
 
@@ -75,9 +73,7 @@ extension NSFont {
 
 extension CGRect {
 	var center: CGPoint {
-		get {
-			return CGPoint(x: midX, y: midY)
-		}
+		get { CGPoint(x: midX, y: midY) }
 		set {
 			origin = CGPoint(
 				x: newValue.x - (size.width / 2),
@@ -89,7 +85,7 @@ extension CGRect {
 
 
 extension NSBezierPath {
-	/// UIKit polyfill
+	/// UIKit polyfill.
 	var cgPath: CGPath {
 		let path = CGMutablePath()
 		var points = [CGPoint](repeating: .zero, count: 3)
@@ -113,7 +109,7 @@ extension NSBezierPath {
 		return path
 	}
 
-	/// UIKit polyfill
+	/// UIKit polyfill.
 	convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat) {
 		self.init(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
 	}
@@ -139,4 +135,17 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		super.draw(in: context)
 		context.restoreGState()
 	}
+}
+
+
+/// macOS 10.14 polyfill.
+extension NSColor {
+	public static let controlAccentColorPolyfill: NSColor = {
+		if #available(macOS 10.14, *) {
+			return NSColor.controlAccentColor
+		} else {
+			// swiftlint:disable:next object_literal
+			return NSColor(red: 0.10, green: 0.47, blue: 0.98, alpha: 1)
+		}
+	}()
 }

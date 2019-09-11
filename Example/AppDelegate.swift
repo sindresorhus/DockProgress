@@ -3,14 +3,14 @@ import DockProgress
 
 @NSApplicationMain
 final class AppDelegate: NSObject, NSApplicationDelegate {
-	func borrowIconFrom(app: String) {
+	func borrowIconFromApp(_ app: String) {
 		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.fullPath(forApplication: app)!)
 		icon.size = CGSize(width: 128, height: 128)
 		NSApp.applicationIconImage = icon
 	}
 
 	func applicationDidFinishLaunching(_ notification: Notification) {
-		borrowIconFrom(app: "Photos")
+		borrowIconFromApp("Photos")
 
 		let styles: [DockProgress.ProgressStyle] = [
 			.bar,
