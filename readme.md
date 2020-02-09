@@ -57,6 +57,8 @@ progress?.becomeCurrent(withPendingUnitCount: 1)
 DockProgress.progressInstance = progress
 ```
 
+The given `Progress` instance is weakly stored. It's up to you to retain it.
+
 ## Styles
 
 It comes with three styles. PR welcome for more.

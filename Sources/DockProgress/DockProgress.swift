@@ -9,7 +9,7 @@ public final class DockProgress {
 		NSApp.dockTile.contentView = $0
 	}
 
-	public static var progressInstance: Progress? {
+	public static weak var progressInstance: Progress? {
 		didSet {
 			guard let progressInstance = progressInstance else {
 				return
