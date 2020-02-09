@@ -17,7 +17,7 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 #### SwiftPM
 
 ```swift
-.package(url: "https://github.com/sindresorhus/DockProgress", from: "2.1.0")
+.package(url: "https://github.com/sindresorhus/DockProgress", from: "3.0.0")
 ```
 
 #### Carthage
