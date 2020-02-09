@@ -6,13 +6,11 @@
 
 This package is used in production by the [Gifski app](https://github.com/sindresorhus/Gifski). You might also like some of my [other apps](https://sindresorhus.com/apps).
 
-
 ## Requirements
 
 - macOS 10.12+
 - Xcode 10.2+
 - Swift 5.1+
-
 
 ## Install
 
@@ -33,7 +31,6 @@ github "sindresorhus/DockProgress"
 ```ruby
 pod 'DockProgress'
 ```
-
 
 ## Usage
 
@@ -59,7 +56,6 @@ progress?.becomeCurrent(withPendingUnitCount: 1)
 
 DockProgress.progressInstance = progress
 ```
-
 
 ## Styles
 
@@ -106,7 +102,6 @@ DockProgress.style = .badge(color: .systemBlue, badgeValue: { getDownloadCount()
 Large `badgeValue` numbers will be written in kilo short notation, for example, `1012` → `1k`.
 
 Note: The `badgeValue` is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
-
 
 ## Related
 

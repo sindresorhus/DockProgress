@@ -16,7 +16,9 @@ whitelist_rules:
   - contains_over_filter_count
   - contains_over_filter_is_empty
   - contains_over_first_not_nil
+  - contains_over_range_nil_comparison
   - control_statement
+  - custom_rules
   - deployment_target
   - discarded_notification_center_observer
   - discouraged_direct_init
@@ -33,10 +35,12 @@ whitelist_rules:
   - empty_parentheses_with_trailing_closure
   - empty_string
   - empty_xctest_method
+  - enum_case_associated_value_count
   - explicit_init
   - fallthrough
   - fatal_error_message
   - first_where
+  - flatmap_over_map_reduce
   - for_where
   - generic_type_name
   - identical_operands
@@ -64,7 +68,6 @@ whitelist_rules:
   - multiline_literal_brackets
   - multiline_parameters
   - multiline_parameters_brackets
-  - multiple_closures_with_trailing_closure
   - nimble_operator
   - no_extension_access_modifier
   - no_fallthrough_only
@@ -76,8 +79,10 @@ whitelist_rules:
   - opening_brace
   - operator_usage_whitespace
   - operator_whitespace
+  - orphaned_doc_comment
   - overridden_super_call
   - pattern_matching_keywords
+  - prefer_self_type_over_type_of_self
   - private_action
   - private_outlet
   - private_unit_test
@@ -111,7 +116,6 @@ whitelist_rules:
   - trailing_newline
   - trailing_semicolon
   - trailing_whitespace
-  - type_name
   - unavailable_function
   - unneeded_break_in_switch
   - unneeded_parentheses_in_closure_argument
@@ -144,18 +148,6 @@ object_literal:
   image_literal: false
 discouraged_object_literal:
   color_literal: false
-type_contents_order:
-  order:
-    - case
-    - [type_alias, associated_type, subtype]
-    - type_property
-    - type_method
-    - ib_outlet
-    - [ib_inspectable, instance_property]
-    - initializer
-    - subscript
-    - view_life_cycle_method
-    - [ib_action, other_method]
 identifier_name:
   max_length:
     warning: 100
@@ -175,4 +167,18 @@ identifier_name:
     - 'x2'
     - 'y1'
     - 'y2'
-macOS_deployment_target: '10.12'
+deployment_target:
+  macOS_deployment_target: '10.12'
+custom_rules:
+  no_nsrect:
+    regex: '\bNSRect\b'
+    match_kinds: typeidentifier
+    message: 'Use CGRect instead of NSRect'
+  no_nssize:
+    regex: '\bNSSize\b'
+    match_kinds: typeidentifier
+    message: 'Use CGSize instead of NSSize'
+  no_nspoint:
+    regex: '\bNSPoint\b'
+    match_kinds: typeidentifier
+    message: 'Use CGPoint instead of NSPoint'

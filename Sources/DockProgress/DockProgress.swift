@@ -1,33 +1,34 @@
 import Cocoa
 
 public final class DockProgress {
-	private static let appIcon = NSApp.applicationIconImage!
 	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
-	private static var dockImageView = with(NSImageView()) {
+	private static let dockImageView = with(NSImageView()) {
 		NSApp.dockTile.contentView = $0
 	}
 
 	public static var progressInstance: Progress? {
 		didSet {
-			if let progressInstance = progressInstance {
-				progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
-					guard !sender.isCancelled && !sender.isFinished else {
-						return
-					}
+			guard let progressInstance = progressInstance else {
+				return
+			}
 
-					progress = sender.fractionCompleted
+			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
+				guard !sender.isCancelled, !sender.isFinished else {
+					return
 				}
 
-				finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
-					guard !sender.isCancelled && sender.isFinished else {
-						return
-					}
+				progress = sender.fractionCompleted
+			}
 
-					progress = 1
+			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
+				guard !sender.isCancelled, sender.isFinished else {
+					return
 				}
+
+				progress = 1
 			}
 		}
 	}
@@ -61,17 +62,21 @@ public final class DockProgress {
 	private static func updateDockIcon() {
 		// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
 		DispatchQueue.main.async {
-			let icon = (0..<1).contains(progress) ? draw() : appIcon
+			guard let appIcon = NSApp.applicationIconImage else {
+				return
+			}
+
+			let icon = (0..<1).contains(progress) ? draw(appIcon) : appIcon
 			// TODO: Make this better by drawing in the `contentView` directly instead of using an image
 			dockImageView.image = icon
 			NSApp.dockTile.display()
 		}
 	}
 
-	private static func draw() -> NSImage {
-		return NSImage(size: appIcon.size, flipped: false) { dstRect in
+	private static func draw(_ appIcon: NSImage) -> NSImage {
+		NSImage(size: appIcon.size, flipped: false) { dstRect in
 			NSGraphicsContext.current?.imageInterpolation = .high
-			self.appIcon.draw(in: dstRect)
+			appIcon.draw(in: dstRect)
 
 			switch self.style {
 			case .bar:
