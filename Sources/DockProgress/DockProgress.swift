@@ -12,11 +12,17 @@ public final class DockProgress {
 	public static weak var progressInstance: Progress? {
 		didSet {
 			guard let progressInstance = progressInstance else {
+				progressObserver = nil
+				finishedObserver = nil
+				resetProgress()
 				return
 			}
 
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
-				guard !sender.isCancelled, !sender.isFinished else {
+				guard
+					!sender.isCancelled,
+					!sender.isFinished
+				else {
 					return
 				}
 
@@ -24,7 +30,10 @@ public final class DockProgress {
 			}
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
-				guard !sender.isCancelled, sender.isFinished else {
+				guard
+					!sender.isCancelled,
+					sender.isFinished
+				else {
 					return
 				}
 
