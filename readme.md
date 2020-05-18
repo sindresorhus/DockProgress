@@ -16,9 +16,7 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 
 #### Swift Package Manager
 
-```swift
-.package(url: "https://github.com/sindresorhus/DockProgress", from: "3.0.0")
-```
+Add `https://github.com/sindresorhus/DockProgress` in the [“Swift Package Manager” tab in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
 #### Carthage
 
