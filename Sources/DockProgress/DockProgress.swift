@@ -90,11 +90,11 @@ public final class DockProgress {
 			switch self.style {
 			case .bar:
 				self.drawProgressBar(dstRect)
-			case let .circle(radius, color):
+			case .circle(let radius, let color):
 				self.drawProgressCircle(dstRect, radius: radius, color: color)
-			case let .badge(color, badgeValue):
+			case .badge(let color, let badgeValue):
 				self.drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
-			case let .custom(drawingHandler):
+			case .custom(let drawingHandler):
 				drawingHandler(dstRect)
 			}
 
