@@ -1,7 +1,7 @@
 import Cocoa
 import DockProgress
 
-@NSApplicationMain
+@main
 final class AppDelegate: NSObject, NSApplicationDelegate {
 	func borrowIconFromApp(_ app: String) {
 		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.fullPath(forApplication: app)!)

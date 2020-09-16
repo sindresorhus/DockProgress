@@ -1,6 +1,6 @@
 import Cocoa
 
-public final class DockProgress {
+public enum DockProgress {
 	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
