@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -181,7 +181,7 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftUpdateCheck = 0940;
-				LastUpgradeCheck = 1160;
+				LastUpgradeCheck = 1200;
 				TargetAttributes = {
 					"DockProgress::DockProgress" = {
 						LastSwiftMigration = 1020;
@@ -193,7 +193,7 @@
 				};
 			};
 			buildConfigurationList = OBJ_2 /* Build configuration list for PBXProject "DockProgress" */;
-			compatibilityVersion = "Xcode 11.0";
+			compatibilityVersion = "Xcode 12.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -463,6 +463,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;
@@ -512,6 +513,7 @@
 				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
 				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
 				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
 				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
 				CLANG_WARN_STRICT_PROTOTYPES = YES;
 				CLANG_WARN_SUSPICIOUS_MOVE = YES;

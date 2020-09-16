@@ -81,7 +81,6 @@ whitelist_rules:
   - operator_whitespace
   - orphaned_doc_comment
   - overridden_super_call
-  - pattern_matching_keywords
   - prefer_self_type_over_type_of_self
   - private_action
   - private_outlet
@@ -109,7 +108,6 @@ whitelist_rules:
   - switch_case_alignment
   - switch_case_on_newline
   - syntactic_sugar
-  - todo
   - toggle_bool
   - trailing_closure
   - trailing_comma
@@ -121,7 +119,6 @@ whitelist_rules:
   - unneeded_parentheses_in_closure_argument
   - unowned_variable_capture
   - untyped_error_in_catch
-  - unused_capture_list
   - unused_closure_parameter
   - unused_control_flow_label
   - unused_enumerated
