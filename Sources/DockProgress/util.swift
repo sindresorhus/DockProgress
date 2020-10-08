@@ -36,6 +36,24 @@ extension NSBezierPath {
 	}
 }
 
+final class ProgressRectangleShapeLayer: CAShapeLayer {
+	convenience init(rect: CGRect, width: Double, height: Double, x: Double, y: Double) {
+		self.init()
+		fillColor = nil
+		lineCap = .round
+		position = CGPoint.zero
+		strokeEnd = 0
+		let cgPath = NSBezierPath(roundedRect: NSRect(x: x, y: y, width: width, height: height), cornerRadius: 3).reversed.cgPath
+		path = cgPath
+		bounds = cgPath.boundingBox
+	}
+	var progress: Double {
+		get { Double(strokeEnd) }
+		set {
+			strokeEnd = CGFloat(newValue)
+		}
+	}
+}
 
 final class ProgressCircleShapeLayer: CAShapeLayer {
 	convenience init(radius: Double, center: CGPoint) {

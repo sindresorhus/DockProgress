@@ -61,6 +61,7 @@ public enum DockProgress {
 	public enum ProgressStyle {
 		case bar
 		case circle(radius: Double, color: NSColor = .controlAccentColorPolyfill)
+		case rectangle(width: Double, height: Double, x: Double, y: Double, color: NSColor = .controlAccentColorPolyfill)
 		case badge(color: NSColor = .controlAccentColorPolyfill, badgeValue: () -> Int)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
@@ -92,6 +93,8 @@ public enum DockProgress {
 				self.drawProgressBar(dstRect)
 			case .circle(let radius, let color):
 				self.drawProgressCircle(dstRect, radius: radius, color: color)
+			case .rectangle(let width, let height, let x, let y, let color):
+				self.drawProgressRectangle(dstRect, width: width, height: height, x: x, y: y, color: color)
 			case .badge(let color, let badgeValue):
 				self.drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
 			case .custom(let drawingHandler):
@@ -127,6 +130,19 @@ public enum DockProgress {
 		}
 
 		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
+		progressCircle.strokeColor = color.cgColor
+		progressCircle.lineWidth = 4
+		progressCircle.cornerRadius = 3
+		progressCircle.progress = progress
+		progressCircle.render(in: cgContext)
+	}
+
+	private static func drawProgressRectangle(_ dstRect: CGRect, width: Double, height: Double, x: Double, y: Double, color: NSColor) {
+		guard let cgContext = NSGraphicsContext.current?.cgContext else {
+			return
+		}
+
+		let progressCircle = ProgressRectangleShapeLayer(rect: dstRect, width: width, height: height, x: x, y: y)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
 		progressCircle.cornerRadius = 3
