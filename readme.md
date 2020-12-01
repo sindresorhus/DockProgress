@@ -77,6 +77,18 @@ DockProgress.style = .bar
 
 This is the default.
 
+### Squircle
+
+<img src="screenshot-squircle.gif" width="158" height="158">
+
+```swift
+import DockProgress
+
+DockProgress.style = .squircle(color: NSColor.white.withAlphaComponent(0.5))
+```
+
+By default, it should perfectly fit a macOS 11 icon, but there's a `inset` parameter if you need to make any adjustments.
+
 ### Circle
 
 ![](screenshot-circle.gif)

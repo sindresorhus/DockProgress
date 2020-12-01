@@ -14,7 +14,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
 		let styles: [DockProgress.ProgressStyle] = [
 			.bar,
-			.circle(radius: 58, color: .systemPink),
+			.squircle(color: .systemGray),
+			.circle(radius: 30, color: .white),
 			.badge(color: .systemBlue, badgeValue: { Int(DockProgress.progress * 12) })
 		]
 
@@ -29,7 +30,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 					DockProgress.resetProgress()
 					DockProgress.style = style
 				} else {
-					// Reset iterator when all is looped
+					// Reset iterator when all is looped.
 					stylesIterator = styles.makeIterator()
 				}
 			}
