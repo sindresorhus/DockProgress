@@ -26,7 +26,7 @@ extension NSBezierPath {
 	*/
 	static func superellipse(in rect: CGRect, cornerRadius: Double) -> Self {
 		let minSide = min(rect.width, rect.height)
-		let radius = min(CGFloat(cornerRadius), minSide / 2)
+		let radius = min(cornerRadius, minSide / 2)
 
 		let topLeft = CGPoint(x: rect.minX, y: rect.minY)
 		let topRight = CGPoint(x: rect.maxX, y: rect.minY)
@@ -66,11 +66,11 @@ extension NSBezierPath {
 	/**
 	Create a path for a squircle that fits inside the given `rect`.
 
-	- Important: The given `rect` must be square.
+	- Precondition: The given `rect` must be square.
 	*/
 	static func squircle(rect: CGRect) -> Self {
 		assert(rect.width == rect.height)
-		return superellipse(in: rect, cornerRadius: Double(rect.width / 2))
+		return superellipse(in: rect, cornerRadius: rect.width / 2)
 	}
 }
 
@@ -94,23 +94,25 @@ final class ProgressSquircleShapeLayer: CAShapeLayer {
 	}
 
 	var progress: Double {
-		get { Double(strokeEnd) }
+		get { strokeEnd }
 		set {
 			// Multiplying by `1.02` ensures that the start and end points meet at the end. Needed because of the round line cap.
-			strokeEnd = CGFloat(newValue * 1.02)
+			strokeEnd = newValue * 1.02
 		}
 	}
 }
 
 
 extension NSBezierPath {
-	/// For making a circle progress indicator.
+	/**
+	For making a circle progress indicator.
+	*/
 	static func progressCircle(radius: Double, center: CGPoint) -> Self {
-		let startAngle: CGFloat = 90
+		let startAngle = 90.0
 		let path = self.init()
 		path.appendArc(
 			withCenter: center,
-			radius: CGFloat(radius),
+			radius: radius,
 			startAngle: startAngle,
 			endAngle: startAngle - 360,
 			clockwise: true
@@ -134,10 +136,10 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 	}
 
 	var progress: Double {
-		get { Double(strokeEnd) }
+		get { strokeEnd }
 		set {
 			// Multiplying by `1.02` ensures that the start and end points meet at the end. Needed because of the round line cap.
-			strokeEnd = CGFloat(newValue * 1.02)
+			strokeEnd = newValue * 1.02
 		}
 	}
 }
@@ -145,7 +147,7 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 
 extension NSColor {
 	func withAlpha(_ alpha: Double) -> NSColor {
-		withAlphaComponent(CGFloat(alpha))
+		withAlphaComponent(alpha)
 	}
 }
 
@@ -169,7 +171,9 @@ extension CGRect {
 
 
 extension NSBezierPath {
-	/// UIKit polyfill.
+	/**
+	UIKit polyfill.
+	*/
 	var cgPath: CGPath {
 		let path = CGMutablePath()
 		var points = [CGPoint](repeating: .zero, count: 3)
@@ -193,17 +197,23 @@ extension NSBezierPath {
 		return path
 	}
 
-	/// UIKit polyfill.
-	convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat) {
+	/**
+	UIKit polyfill.
+	*/
+	convenience init(roundedRect rect: CGRect, cornerRadius: CGFloat) { // swiftlint:disable:this no_cgfloat
 		self.init(roundedRect: rect, xRadius: cornerRadius, yRadius: cornerRadius)
 	}
 
-	/// UIKit polyfill.
+	/**
+	UIKit polyfill.
+	*/
 	func addLine(to point: CGPoint) {
 		line(to: point)
 	}
 
-	/// UIKit polyfill.
+	/**
+	UIKit polyfill.
+	*/
 	func addCurve(to endPoint: CGPoint, controlPoint1: CGPoint, controlPoint2: CGPoint) {
 		curve(to: endPoint, controlPoint1: controlPoint1, controlPoint2: controlPoint2)
 	}
@@ -218,7 +228,7 @@ extension NSBezierPath {
 	func rotationTransform(byRadians radians: Double, centerPoint point: CGPoint) -> AffineTransform {
 		var transform = AffineTransform()
 		transform.translate(x: point.x, y: point.y)
-		transform.rotate(byRadians: CGFloat(radians))
+		transform.rotate(byRadians: radians)
 		transform.translate(x: -point.x, y: -point.y)
 		return transform
 	}
@@ -237,7 +247,9 @@ extension NSBezierPath {
 }
 
 
-/// Fixes the vertical alignment issue of the `CATextLayer` class.
+/**
+Fixes the vertical alignment issue of the `CATextLayer` class.
+*/
 final class VerticallyCenteredTextLayer: CATextLayer {
 	convenience init(frame rect: CGRect, center: CGPoint) {
 		self.init()
@@ -256,17 +268,4 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		super.draw(in: context)
 		context.restoreGState()
 	}
-}
-
-
-/// macOS 10.14 polyfill.
-extension NSColor {
-	public static let controlAccentColorPolyfill: NSColor = {
-		if #available(macOS 10.14, *) {
-			return NSColor.controlAccentColor
-		} else {
-			// swiftlint:disable:next object_literal
-			return NSColor(red: 0.10, green: 0.47, blue: 0.98, alpha: 1)
-		}
-	}()
 }

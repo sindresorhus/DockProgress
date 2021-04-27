@@ -1,5 +1,6 @@
 import Cocoa
 
+@MainActor
 public enum DockProgress {
 	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
@@ -18,6 +19,7 @@ public enum DockProgress {
 				return
 			}
 
+			// TODO: Use AsyncSequence when targeting macOS 12.
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
 				guard
 					!sender.isCancelled,
@@ -44,14 +46,21 @@ public enum DockProgress {
 
 	public static var progress: Double = 0 {
 		didSet {
-			if previousProgress == 0 || (progress - previousProgress).magnitude > 0.01 {
-				previousProgress = progress
-				updateDockIcon()
+			guard
+				previousProgress == 0
+					|| (progress - previousProgress).magnitude > 0.01
+			else {
+				return
 			}
+
+			previousProgress = progress
+			updateDockIcon()
 		}
 	}
 
-	/// Reset the `progress` without animating.
+	/**
+	Reset the `progress` without animating.
+	*/
 	public static func resetProgress() {
 		progress = 0
 		previousProgress = 0
@@ -60,43 +69,41 @@ public enum DockProgress {
 
 	public enum ProgressStyle {
 		case bar
-		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColorPolyfill)
-		case circle(radius: Double, color: NSColor = .controlAccentColorPolyfill)
-		case badge(color: NSColor = .controlAccentColorPolyfill, badgeValue: () -> Int)
+		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
+		case circle(radius: Double, color: NSColor = .controlAccentColor)
+		case badge(color: NSColor = .controlAccentColor, badgeValue: () -> Int)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
-	public static var style: ProgressStyle = .bar
+	public static var style = ProgressStyle.bar
 
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
 		// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-		DispatchQueue.main.async {
-			guard let appIcon = NSApp.applicationIconImage else {
-				return
-			}
-
-			let icon = (0..<1).contains(progress) ? draw(appIcon) : appIcon
-			// TODO: Make this better by drawing in the `contentView` directly instead of using an image
-			dockImageView.image = icon
-			NSApp.dockTile.display()
+		guard let appIcon = NSApp.applicationIconImage else {
+			return
 		}
+
+		let icon = (0..<1).contains(progress) ? draw(appIcon) : appIcon
+		// TODO: Make this better by drawing in the `contentView` directly instead of using an image
+		dockImageView.image = icon
+		NSApp.dockTile.display()
 	}
 
 	private static func draw(_ appIcon: NSImage) -> NSImage {
-		NSImage(size: appIcon.size, flipped: false) { dstRect in
+		NSImage(size: appIcon.size, flipped: false) { [self] dstRect in
 			NSGraphicsContext.current?.imageInterpolation = .high
 			appIcon.draw(in: dstRect)
 
-			switch self.style {
+			switch style {
 			case .bar:
-				self.drawProgressBar(dstRect)
+				drawProgressBar(dstRect)
 			case .squircle(let inset, let color):
-				self.drawProgressSquircle(dstRect, inset: inset, color: color)
+				drawProgressSquircle(dstRect, inset: inset, color: color)
 			case .circle(let radius, let color):
-				self.drawProgressCircle(dstRect, radius: radius, color: color)
+				drawProgressCircle(dstRect, radius: radius, color: color)
 			case .badge(let color, let badgeValue):
-				self.drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
+				drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
 			case .custom(let drawingHandler):
 				drawingHandler(dstRect)
 			}
@@ -119,7 +126,7 @@ public enum DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * CGFloat(progress)
+		barProgress.size.width = barProgress.width * progress
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}
@@ -129,12 +136,12 @@ public enum DockProgress {
 			return
 		}
 
-		let defaultInset: CGFloat = 14.4
+		let defaultInset = 14.4
 
 		var rect = dstRect.insetBy(dx: defaultInset, dy: defaultInset)
 
 		if let inset = inset {
-			rect = rect.insetBy(dx: CGFloat(inset), dy: CGFloat(inset))
+			rect = rect.insetBy(dx: inset, dy: inset)
 		}
 
 		let progressSquircle = ProgressSquircleShapeLayer(rect: rect)
@@ -165,7 +172,7 @@ public enum DockProgress {
 		let newCenter = CGPoint(x: dstRect.maxX - radius - 4, y: dstRect.minY + radius + 4)
 
 		// Background
-		let badge = ProgressCircleShapeLayer(radius: Double(radius), center: newCenter)
+		let badge = ProgressCircleShapeLayer(radius: radius, center: newCenter)
 		badge.fillColor = CGColor(red: 0.94, green: 0.96, blue: 1, alpha: 1)
 		badge.shadowColor = .black
 		badge.shadowOpacity = 0.3
@@ -174,9 +181,9 @@ public enum DockProgress {
 		badge.shadowPath = badge.path
 
 		// Progress circle
-		let lineWidth: CGFloat = 6
+		let lineWidth = 6.0
 		let innerRadius = radius - lineWidth / 2
-		let progressCircle = ProgressCircleShapeLayer(radius: Double(innerRadius), center: newCenter)
+		let progressCircle = ProgressCircleShapeLayer(radius: innerRadius, center: newCenter)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
@@ -221,7 +228,7 @@ public enum DockProgress {
 		}
 	}
 
-	private static func scaledBadgeFontSize(text: String) -> CGFloat {
+	private static func scaledBadgeFontSize(text: String) -> Double {
 		switch text.count {
 		case 1:
 			return 30

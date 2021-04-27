@@ -8,15 +8,17 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 
 ## Requirements
 
-- macOS 10.12+
-- Xcode 12+
-- Swift 5.3+
+- macOS 10.15+
+- Xcode 13.4+
+- Swift 5.6+
 
 ## Install
 
 #### Swift Package Manager
 
 Add `https://github.com/sindresorhus/DockProgress` in the [“Swift Package Manager” tab in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
+
+*Latest version: 3.2.0*
 
 #### Carthage
 
@@ -59,7 +61,7 @@ The given `Progress` instance is weakly stored. It's up to you to retain it.
 
 ## Styles
 
-It comes with three styles. PR welcome for more.
+It comes with four styles. PR welcome for more.
 
 Check out the example app in the Xcode project.
 
@@ -84,10 +86,10 @@ This is the default.
 ```swift
 import DockProgress
 
-DockProgress.style = .squircle(color: NSColor.white.withAlphaComponent(0.5))
+DockProgress.style = .squircle(color: .white.withAlphaComponent(0.5))
 ```
 
-By default, it should perfectly fit a macOS 11 icon, but there's a `inset` parameter if you need to make any adjustments.
+By default, it should perfectly fit a macOS 11 and later icon, but there is an `inset` parameter if you need to make any adjustments.
 
 ### Circle
 
@@ -121,4 +123,5 @@ Note: The `badgeValue` is not meant to be used as a numeric percentage. It's for
 - [Preferences](https://github.com/sindresorhus/Preferences) - Add a preferences window to your macOS app in minutes
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - Add user-customizable global keyboard shortcuts to your macOS app
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
+- [Regex](https://github.com/sindresorhus/Regex) - Swifty regular expressions
 - [More…](https://github.com/search?q=user%3Asindresorhus+language%3Aswift)

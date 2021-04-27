@@ -2,6 +2,7 @@ import Cocoa
 import DockProgress
 
 @main
+@MainActor
 final class AppDelegate: NSObject, NSApplicationDelegate {
 	func borrowIconFromApp(_ app: String) {
 		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.fullPath(forApplication: app)!)
@@ -16,7 +17,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 			.bar,
 			.squircle(color: .systemGray),
 			.circle(radius: 30, color: .white),
-			.badge(color: .systemBlue, badgeValue: { Int(DockProgress.progress * 12) })
+			.badge(color: .systemBlue) { Int(DockProgress.progress * 12) }
 		]
 
 		var stylesIterator = styles.makeIterator()
