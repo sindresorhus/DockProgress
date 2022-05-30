@@ -1,19 +1,22 @@
-import Cocoa
+import SwiftUI
 import DockProgress
 
-@main
 @MainActor
-final class AppDelegate: NSObject, NSApplicationDelegate {
-	func borrowIconFromApp(_ app: String) {
-		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.fullPath(forApplication: app)!)
-		icon.size = CGSize(width: 128, height: 128)
-		NSApp.applicationIconImage = icon
+final class AppState: ObservableObject {
+	init() {
+		DispatchQueue.main.async { [self] in
+			didLaunch()
+		}
 	}
 
-	func applicationDidFinishLaunching(_ notification: Notification) {
-		borrowIconFromApp("Photos")
+	private func didLaunch() {
+		runExample()
+	}
 
-		let styles: [DockProgress.ProgressStyle] = [
+	private func runExample() {
+		borrowIconFromApp("com.apple.Photos")
+
+		let styles: [DockProgress.Style] = [
 			.bar,
 			.squircle(color: .systemGray),
 			.circle(radius: 30, color: .white),
@@ -36,5 +39,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 				}
 			}
 		}
+	}
+
+	private func borrowIconFromApp(_ app: String) {
+		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.urlForApplication(withBundleIdentifier: app)!.path)
+		icon.size = CGSize(width: 128, height: 128)
+		NSApp.applicationIconImage = icon
 	}
 }

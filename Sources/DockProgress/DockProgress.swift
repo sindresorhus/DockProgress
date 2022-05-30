@@ -67,7 +67,7 @@ public enum DockProgress {
 		updateDockIcon()
 	}
 
-	public enum ProgressStyle {
+	public enum Style {
 		case bar
 		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
 		case circle(radius: Double, color: NSColor = .controlAccentColor)
@@ -75,7 +75,7 @@ public enum DockProgress {
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
-	public static var style = ProgressStyle.bar
+	public static var style = Style.bar
 
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
