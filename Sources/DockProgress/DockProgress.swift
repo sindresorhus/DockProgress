@@ -21,25 +21,29 @@ public enum DockProgress {
 
 			// TODO: Use AsyncSequence when targeting macOS 12.
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
-				guard
-					!sender.isCancelled,
-					!sender.isFinished
-				else {
-					return
-				}
+				Task { @MainActor in
+					guard
+						!sender.isCancelled,
+						!sender.isFinished
+					else {
+						return
+					}
 
-				progress = sender.fractionCompleted
+					progress = sender.fractionCompleted
+				}
 			}
 
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
-				guard
-					!sender.isCancelled,
-					sender.isFinished
-				else {
-					return
-				}
+				Task { @MainActor in
+					guard
+						!sender.isCancelled,
+						sender.isFinished
+					else {
+						return
+					}
 
-				progress = 1
+					progress = 1
+				}
 			}
 		}
 	}
