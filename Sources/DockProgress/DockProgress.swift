@@ -12,7 +12,7 @@ public enum DockProgress {
 
 	public static weak var progressInstance: Progress? {
 		didSet {
-			guard let progressInstance = progressInstance else {
+			guard let progressInstance else {
 				progressObserver = nil
 				finishedObserver = nil
 				resetProgress()
@@ -144,7 +144,7 @@ public enum DockProgress {
 
 		var rect = dstRect.insetBy(dx: defaultInset, dy: defaultInset)
 
-		if let inset = inset {
+		if let inset {
 			rect = rect.insetBy(dx: inset, dy: inset)
 		}
 

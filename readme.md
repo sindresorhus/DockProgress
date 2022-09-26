@@ -8,9 +8,7 @@ This package is used in production by the [Gifski app](https://github.com/sindre
 
 ## Requirements
 
-- macOS 10.15+
-- Xcode 13.4+
-- Swift 5.6+
+macOS 10.15+
 
 ## Install
 
