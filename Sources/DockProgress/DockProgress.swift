@@ -88,7 +88,7 @@ public enum DockProgress {
 			return
 		}
 
-		let icon = (0..<1).contains(progress) ? draw(appIcon) : appIcon
+		let icon = progress > 0 && progress < 1 ? draw(appIcon) : appIcon
 		// TODO: Make this better by drawing in the `contentView` directly instead of using an image
 		dockImageView.image = icon
 		NSApp.dockTile.display()
