@@ -12,30 +12,15 @@ macOS 10.15+
 
 ## Install
 
-#### Swift Package Manager
-
 Add `https://github.com/sindresorhus/DockProgress` in the [“Swift Package Manager” tab in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
 *Latest version: 4.0.1*
-
-#### Carthage
-
-```
-github "sindresorhus/DockProgress"
-```
-
-#### CocoaPods
-
-```ruby
-pod 'DockProgress'
-```
 
 ## Usage
 
 ### Manually set the progress
 
 ```swift
-import Cocoa
 import DockProgress
 
 foo.onUpdate = { progress in
@@ -46,7 +31,7 @@ foo.onUpdate = { progress in
 ### Specify a [`Progress` instance](https://developer.apple.com/documentation/foundation/progress)
 
 ```swift
-import Cocoa
+import Foundation
 import DockProgress
 
 let progress = Progress(totalUnitCount: 1)
@@ -59,7 +44,7 @@ The given `Progress` instance is weakly stored. It's up to you to retain it.
 
 ## Styles
 
-It comes with four styles. PR welcome for more.
+It comes with five styles. PR welcome for more.
 
 Check out the example app in the Xcode project.
 
@@ -113,7 +98,17 @@ DockProgress.style = .badge(color: .systemBlue, badgeValue: { getDownloadCount()
 
 Large `badgeValue` numbers will be written in kilo short notation, for example, `1012` → `1k`.
 
-Note: The `badgeValue` is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
+**Note:** The `badgeValue` is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
+
+### Pie
+
+![](screenshot-pie.gif)
+
+```swift
+import DockProgress
+
+DockProgress.style = .pie(color: .systemBlue)
+```
 
 ## Related
 

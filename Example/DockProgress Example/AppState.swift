@@ -20,7 +20,8 @@ final class AppState: ObservableObject {
 			.bar,
 			.squircle(color: .systemGray),
 			.circle(radius: 30, color: .white),
-			.badge(color: .systemBlue) { Int(DockProgress.progress * 12) }
+			.badge(color: .systemBlue) { Int(DockProgress.progress * 12) },
+			.pie(color: .systemBlue)
 		]
 
 		var stylesIterator = styles.makeIterator()

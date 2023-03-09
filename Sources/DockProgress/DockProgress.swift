@@ -76,6 +76,7 @@ public enum DockProgress {
 		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
 		case circle(radius: Double, color: NSColor = .controlAccentColor)
 		case badge(color: NSColor = .controlAccentColor, badgeValue: () -> Int)
+		case pie(color: NSColor = .controlAccentColor)
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
@@ -108,6 +109,8 @@ public enum DockProgress {
 				drawProgressCircle(dstRect, radius: radius, color: color)
 			case .badge(let color, let badgeValue):
 				drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
+			case .pie(let color):
+				drawProgressBadge(dstRect, color: color, badgeLabel: 0, isPie: true)
 			case .custom(let drawingHandler):
 				drawingHandler(dstRect)
 			}
@@ -167,7 +170,7 @@ public enum DockProgress {
 		progressCircle.render(in: cgContext)
 	}
 
-	private static func drawProgressBadge(_ dstRect: CGRect, color: NSColor, badgeLabel: Int) {
+	private static func drawProgressBadge(_ dstRect: CGRect, color: NSColor, badgeLabel: Int, isPie: Bool = false) {
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
 		}
@@ -185,7 +188,7 @@ public enum DockProgress {
 		badge.shadowPath = badge.path
 
 		// Progress circle
-		let lineWidth = 6.0
+		let lineWidth = isPie ? radius : 6.0
 		let innerRadius = radius - lineWidth / 2
 		let progressCircle = ProgressCircleShapeLayer(radius: innerRadius, center: newCenter)
 		progressCircle.strokeColor = color.cgColor
@@ -194,18 +197,21 @@ public enum DockProgress {
 		progressCircle.progress = progress
 
 		// Label
-		let dimension = badge.bounds.height - 5
-		let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
-		let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
-		let badgeText = kiloShortStringFromInt(number: badgeLabel)
-		textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
-		textLayer.string = badgeText
-		textLayer.fontSize = scaledBadgeFontSize(text: badgeText)
-		textLayer.font = NSFont.helveticaNeueBold
-		textLayer.alignmentMode = .center
-		textLayer.truncationMode = .end
+		if !isPie {
+			let dimension = badge.bounds.height - 5
+			let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
+			let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
+			let badgeText = kiloShortStringFromInt(number: badgeLabel)
+			textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
+			textLayer.string = badgeText
+			textLayer.fontSize = scaledBadgeFontSize(text: badgeText)
+			textLayer.font = NSFont.helveticaNeueBold
+			textLayer.alignmentMode = .center
+			textLayer.truncationMode = .end
 
-		badge.addSublayer(textLayer)
+			badge.addSublayer(textLayer)
+		}
+
 		badge.addSublayer(progressCircle)
 		badge.render(in: cgContext)
 	}
