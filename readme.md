@@ -102,7 +102,7 @@ Large `badgeValue` numbers will be written in kilo short notation, for example, 
 
 ### Pie
 
-![](screenshot-pie.gif)
+<img src="screenshot-pie.gif" width="150" height="150">
 
 ```swift
 import DockProgress
