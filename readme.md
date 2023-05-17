@@ -4,7 +4,7 @@
 
 <img src="screenshot.gif" width="485">
 
-This package is used in production by the [Gifski app](https://github.com/sindresorhus/Gifski). You might also like some of my [other apps](https://sindresorhus.com/apps).
+This package is used in production by the [Gifski app](https://github.com/sindresorhus/Gifski). You may also like some of my [other apps](https://sindresorhus.com/apps).
 
 ## Requirements
 
@@ -84,8 +84,6 @@ import DockProgress
 DockProgress.style = .circle(radius: 55, color: .systemBlue)
 ```
 
-Make sure to set a `radius` that matches your app icon.
-
 ### Badge
 
 ![](screenshot-badge.gif)
@@ -113,8 +111,6 @@ DockProgress.style = .pie(color: .systemBlue)
 ## Related
 
 - [Defaults](https://github.com/sindresorhus/Defaults) - Swifty and modern UserDefaults
-- [Preferences](https://github.com/sindresorhus/Preferences) - Add a preferences window to your macOS app in minutes
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - Add user-customizable global keyboard shortcuts to your macOS app
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
-- [Regex](https://github.com/sindresorhus/Regex) - Swifty regular expressions
 - [More…](https://github.com/search?q=user%3Asindresorhus+language%3Aswift)

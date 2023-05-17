@@ -271,56 +271,112 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 	}
 }
 
+
+/**
+Provides functions for linear interpolation and easing effects.
+
+These functions are useful for animations and transitions, or anywhere you want to smoothly transition between two values.
+*/
 enum Easing {
-	static func lerp(_ start: Double, _ end: Double, _ t: Double) -> Double {
-		return Double(simd_mix(Float(start), Float(end), Float(t)))
+	/**
+	Linearly interpolates between two values.
+
+	Also known as `lerp`.
+
+	- Parameters:
+	 - start: The start value.
+	 - end: The end value.
+	 - progress: The interpolation progress as a decimal between 0.0 and 1.0.
+
+	- Returns: The interpolated value.
+	*/
+	static func linearInterpolation(start: Double, end: Double, progress: Double) -> Double {
+		assert(0...1 ~= progress, "Progress must be between 0.0 and 1.0")
+		return Double(simd_mix(Float(start), Float(end), Float(progress)))
 	}
 
-	static private func easeIn(_ t: Double) -> Double {
-		return Double(simd_smoothstep(0.0, 1.0, Float(t)))
+	/**
+	Provides an ease-in effect.
+
+	- Parameter progress: The progress as a decimal between 0.0 and 1.0.
+
+	- Returns: The eased value.
+	*/
+	static private func easeIn(progress: Double) -> Double {
+		assert(0...1 ~= progress, "Progress must be between 0.0 and 1.0")
+		return Double(simd_smoothstep(0.0, 1.0, Float(progress)))
 	}
 
-	static private func easeOut(_ t: Double) -> Double {
-		return 1 - easeIn(1 - t)
+	/**
+	Provides an ease-out effect.
+
+	- Parameter progress: The progress as a decimal between 0.0 and 1.0.
+
+	- Returns: The eased value.
+	*/
+	static private func easeOut(progress: Double) -> Double {
+		assert(0...1 ~= progress, "Progress must be between 0.0 and 1.0")
+		return 1 - easeIn(progress: 1 - progress)
 	}
 
-	static func easeInOut(_ t: Double) -> Double {
-		return lerp(easeIn(t), easeOut(t), t)
+	/**
+	Provides an ease-in-out effect.
+
+	- Parameter progress: The progress as a decimal between 0.0 and 1.0.
+
+	- Returns: The eased value.
+	*/
+	static func easeInOut(progress: Double) -> Double {
+		assert(0...1 ~= progress, "Progress must be between 0.0 and 1.0")
+
+		return linearInterpolation(
+			start: easeIn(progress: progress),
+			end: easeOut(progress: progress),
+			progress: progress
+		)
 	}
 }
 
-typealias DisplayLinkObserverCallback = (DisplayLinkObserver, Double) -> Void;
 
-class DisplayLinkObserver {
+/**
+An observer that invokes a callback for each screen refresh.
+
+This is useful for creating smooth animations that synchronize with the screen's refresh rate.
+*/
+final class DisplayLinkObserver {
 	private var displayLink: CVDisplayLink?
-	var callback: DisplayLinkObserverCallback
+	fileprivate let callback: (DisplayLinkObserver, Double) -> Void
 	
-	init(_ callback: @escaping DisplayLinkObserverCallback) {
+	init(_ callback: @escaping (DisplayLinkObserver, Double) -> Void) {
 		self.callback = callback
-		let result = CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
-		assert(result == kCVReturnSuccess, "Failed to create CVDisplayLink")
+		assert(CVDisplayLinkCreateWithActiveCGDisplays(&displayLink) == kCVReturnSuccess, "Failed to create CVDisplayLink")
+	}
+
+	deinit {
+		stop()
 	}
 	
 	func start() {
-		if let displayLink {
-			let result = CVDisplayLinkSetOutputCallback(
-				displayLink,
-				displayLinkOutputCallback,
-				UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-			)
-			assert(result == kCVReturnSuccess, "Failed to set CVDisplayLink output callback")
-			if (CVDisplayLinkStart(displayLink) != kCVReturnSuccess) {
-				print("Warning: CVDisplayLink already running")
-			}
+		guard let displayLink else {
+			return
 		}
+
+		let result = CVDisplayLinkSetOutputCallback(
+			displayLink,
+			displayLinkOutputCallback,
+			UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+		)
+		assert(result == kCVReturnSuccess, "Failed to set CVDisplayLink output callback")
+
+		CVDisplayLinkStart(displayLink)
 	}
 	
 	func stop() {
-		if let displayLink {
-			if (CVDisplayLinkStop(displayLink) != kCVReturnSuccess) {
-				print("Warning: CVDisplayLink already stopped")
-			}
+		guard let displayLink else {
+			return
 		}
+
+		CVDisplayLinkStop(displayLink)
 	}
 }
 
@@ -333,11 +389,14 @@ private func displayLinkOutputCallback(
 	displayLinkContext: UnsafeMutableRawPointer?
 ) -> CVReturn {
 	let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
+
 	var refreshPeriod = CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
 	if (refreshPeriod == 0) {
 		print("Warning: CVDisplayLinkGetActualOutputVideoRefreshPeriod failed. Assuming 60 Hz...")
 		refreshPeriod = 1.0 / 60.0
 	}
+
 	observer.callback(observer, refreshPeriod)
+
 	return kCVReturnSuccess
 }

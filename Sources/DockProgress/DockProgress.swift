@@ -1,22 +1,34 @@
 import Cocoa
 
+/**
+Show progress in your app's Dock icon.
+
+Use either ``progress`` or ``progressInstance``.
+*/
 @MainActor
 public enum DockProgress {
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
-
 	private static var elapsedTimeSinceLastRefresh = 0.0
-	private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
+
+	private static var displayLinkObserver = DisplayLinkObserver { displayLinkObserver, refreshPeriod in
 		DispatchQueue.main.async {
 			let speed = 1.0
+
 			elapsedTimeSinceLastRefresh += speed * refreshPeriod
-			if (animatedProgress - progress).magnitude <= 0.01 {
-				animatedProgress = progress
+
+			if (displayedProgress - progress).magnitude <= 0.01 {
+				displayedProgress = progress
 				elapsedTimeSinceLastRefresh = 0
 				displayLinkObserver.stop()
 			} else {
-				animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(elapsedTimeSinceLastRefresh));
+				displayedProgress = Easing.linearInterpolation(
+					start: displayedProgress,
+					end: progress,
+					progress: Easing.easeInOut(progress: elapsedTimeSinceLastRefresh)
+				)
 			}
+
 			updateDockIcon()
 		}
 	}
@@ -25,6 +37,23 @@ public enum DockProgress {
 		NSApp.dockTile.contentView = $0
 	}
 
+	/**
+	Assign a [`Progress`](https://developer.apple.com/documentation/foundation/progress) instance to track the progress status.
+
+	When set to `nil`, the progress will be reset.
+
+	The given `Progress` instance is weakly stored. It's up to you to retain it.
+
+	```swift
+	import Foundation
+	import DockProgress
+
+	let progress = Progress(totalUnitCount: 1)
+	progress?.becomeCurrent(withPendingUnitCount: 1)
+
+	DockProgress.progressInstance = progress
+	```
+	*/
 	public static weak var progressInstance: Progress? {
 		didSet {
 			guard let progressInstance else {
@@ -63,6 +92,17 @@ public enum DockProgress {
 		}
 	}
 
+	/**
+	Indicates the current progress from 0.0 to 1.0. Setting this value will start the animation towards the set value.
+
+	```swift
+	import DockProgress
+
+	foo.onUpdate = { progress in
+		DockProgress.progress = progress
+	}
+	```
+	*/
 	public static var progress: Double = 0 {
 		didSet {
 			if progress > 0 {
@@ -74,46 +114,120 @@ public enum DockProgress {
 	}
 	
 	/**
-	The currently displayed progress (readonly). Animates towards `progress`
+	The currently displayed progress. Animates towards ``progress``.
 	*/
-	public private(set) static var animatedProgress = 0.0
+	public private(set) static var displayedProgress = 0.0
 
 	/**
-	Reset the `progress` without animating.
+	Reset the progress without animating.
 	*/
 	public static func resetProgress() {
 		displayLinkObserver.stop()
 		progress = 0
-		animatedProgress = 0
-		elapsedTimeSinceLastRefresh = 0;
+		displayedProgress = 0
+		elapsedTimeSinceLastRefresh = 0
 		updateDockIcon()
 	}
 
+	/**
+	The available progress styles.
+
+	- `.bar` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-bar.gif?raw=true)
+	- `.squircle` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
+	- `.circle` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
+	- `.badge` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
+	- `.pie` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
+	*/
 	public enum Style {
+		/**
+		Progress bar style.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-bar.gif?raw=true)
+		*/
 		case bar
+
+		/**
+		Progress line animating around the edges of the app icon.
+
+		- Parameters:
+			- inset: Inset value to adjust the squircle shape. By default, it should fit a normal macOS icon.
+			- color: The color of the progress.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
+		*/
 		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
+
+		/**
+		Circle style.
+
+		- Parameters:
+			- radius: The radius of the circle.
+			- color: The color of the progress.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
+		*/
 		case circle(radius: Double, color: NSColor = .controlAccentColor)
+
+		/**
+		Badge style.
+
+		- Parameters:
+			- color: The color of the badge.
+			- badgeValue: A closure that returns the badge value as an integer.
+
+		- Note: It is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
+
+		Large badge value numbers will be written in kilo short notation, for example, `1012` → `1k`.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
+		*/
 		case badge(color: NSColor = .controlAccentColor, badgeValue: () -> Int)
+
+		/**
+		Pie style.
+
+		- Parameters:
+			- color: The color of the pie.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
+		*/
 		case pie(color: NSColor = .controlAccentColor)
+
+
+		/**
+		Custom style.
+
+		- Parameters:
+			- drawHandler: A closure that is responsible for drawing the custom progress.
+		*/
 		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 
+	/**
+	The style to be used for displaying progress.
+
+	The default style is `.bar`.
+
+	Check out the example app in the Xcode project for a demo of the styles.
+	*/
 	public static var style = Style.bar
 
-	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
-		dockContentView.needsDisplay = true;
+		dockContentView.needsDisplay = true
 		NSApp.dockTile.display()
 	}
 	
-	private class ContentView: NSView {
+	private final class ContentView: NSView {
 		override func draw(_ dirtyRect: NSRect) {
 			NSGraphicsContext.current?.imageInterpolation = .high
 			
 			NSApp.applicationIconImage?.draw(in: dirtyRect)
 			
 			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-			if (animatedProgress <= 0 || animatedProgress >= 1) {
+			guard
+				displayedProgress > 0,
+				displayedProgress < 1
+			else {
 				return
 			}
 
@@ -148,7 +262,7 @@ public enum DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * animatedProgress
+		barProgress.size.width = barProgress.width * displayedProgress
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}
@@ -169,7 +283,7 @@ public enum DockProgress {
 		let progressSquircle = ProgressSquircleShapeLayer(rect: rect)
 		progressSquircle.strokeColor = color.cgColor
 		progressSquircle.lineWidth = 5
-		progressSquircle.progress = animatedProgress
+		progressSquircle.progress = displayedProgress
 		progressSquircle.render(in: cgContext)
 	}
 
@@ -181,7 +295,7 @@ public enum DockProgress {
 		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
-		progressCircle.progress = animatedProgress
+		progressCircle.progress = displayedProgress
 		progressCircle.render(in: cgContext)
 	}
 
@@ -209,7 +323,7 @@ public enum DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
-		progressCircle.progress = animatedProgress
+		progressCircle.progress = displayedProgress
 
 		// Label
 		if !isPie {
@@ -246,11 +360,13 @@ public enum DockProgress {
 
 		if absNumber < 1000 {
 			return "\(number)"
-		} else if absNumber < 10_000 {
-			return "\(sign * Int(absNumber / 1000))k"
-		} else {
-			return "\(sign * 9)k+"
 		}
+
+		if absNumber < 10_000 {
+			return "\(sign * Int(absNumber / 1000))k"
+		}
+
+		return "\(sign * 9)k+"
 	}
 
 	private static func scaledBadgeFontSize(text: String) -> Double {
