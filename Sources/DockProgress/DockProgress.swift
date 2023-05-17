@@ -6,7 +6,7 @@ public enum DockProgress {
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
-	private static let dockImageView = with(NSImageView()) {
+	private static let dockContentView = with(ContentView()) {
 		NSApp.dockTile.contentView = $0
 	}
 
@@ -84,40 +84,37 @@ public enum DockProgress {
 
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
-		// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-		guard let appIcon = NSApp.applicationIconImage else {
-			return
-		}
-
-		let icon = progress > 0 && progress < 1 ? draw(appIcon) : appIcon
-		// TODO: Make this better by drawing in the `contentView` directly instead of using an image
-		dockImageView.image = icon
+        dockContentView.needsDisplay = true;
 		NSApp.dockTile.display()
 	}
+    
+    private class ContentView: NSView {
+        override func draw(_ dirtyRect: NSRect) {
+            NSGraphicsContext.current?.imageInterpolation = .high
+            
+            NSApp.applicationIconImage?.draw(in: dirtyRect)
+            
+            // TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
+            if (progress <= 0 || progress >= 1) {
+                return
+            }
 
-	private static func draw(_ appIcon: NSImage) -> NSImage {
-		NSImage(size: appIcon.size, flipped: false) { [self] dstRect in
-			NSGraphicsContext.current?.imageInterpolation = .high
-			appIcon.draw(in: dstRect)
-
-			switch style {
-			case .bar:
-				drawProgressBar(dstRect)
-			case .squircle(let inset, let color):
-				drawProgressSquircle(dstRect, inset: inset, color: color)
-			case .circle(let radius, let color):
-				drawProgressCircle(dstRect, radius: radius, color: color)
-			case .badge(let color, let badgeValue):
-				drawProgressBadge(dstRect, color: color, badgeLabel: badgeValue())
-			case .pie(let color):
-				drawProgressBadge(dstRect, color: color, badgeLabel: 0, isPie: true)
-			case .custom(let drawingHandler):
-				drawingHandler(dstRect)
-			}
-
-			return true
-		}
-	}
+            switch style {
+            case .bar:
+                drawProgressBar(dirtyRect)
+            case .squircle(let inset, let color):
+                drawProgressSquircle(dirtyRect, inset: inset, color: color)
+            case .circle(let radius, let color):
+                drawProgressCircle(dirtyRect, radius: radius, color: color)
+            case .badge(let color, let badgeValue):
+                drawProgressBadge(dirtyRect, color: color, badgeLabel: badgeValue())
+            case .pie(let color):
+                drawProgressBadge(dirtyRect, color: color, badgeLabel: 0, isPie: true)
+            case .custom(let drawingHandler):
+                drawingHandler(dirtyRect)
+            }
+        }
+    }
 
 	private static func drawProgressBar(_ dstRect: CGRect) {
 		func roundedRect(_ rect: CGRect) {
