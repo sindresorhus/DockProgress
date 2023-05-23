@@ -3,32 +3,25 @@ import CoreVideo
 
 @MainActor
 public enum DockProgress {
-    private static var t: Double = 0;
-    private static var displayLink: CVDisplayLink?
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
+    private static var t = 0.0
+    private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
+        let speed = 1.0
+        t += speed * refreshPeriod
+        if (animatedProgress - progress).magnitude <= 0.01 {
+            animatedProgress = progress
+            t = 0
+            displayLinkObserver.stop()
+        } else {
+            animatedProgress = lerp(animatedProgress, progress, easeInOut(t));
+        }
+        updateDockIcon()
+    }
+
 	private static let dockContentView = with(ContentView()) {
 		NSApp.dockTile.contentView = $0
-        
-        let displayLinkCallback: CVDisplayLinkOutputCallback = {(displayLink: CVDisplayLink, inNow: UnsafePointer<CVTimeStamp>, inOutputTime: UnsafePointer<CVTimeStamp>, flagsIn: CVOptionFlags, flagsOut: UnsafeMutablePointer<CVOptionFlags>, displayLinkContext: UnsafeMutableRawPointer?) -> CVReturn in
-            Task { @MainActor in
-                let speed = 1.0
-                t += speed * CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
-                if (animatedProgress - progress).magnitude <= 0.01 {
-                    animatedProgress = progress
-                    t = 0
-                    CVDisplayLinkStop(displayLink)
-                } else {
-                    animatedProgress = lerp(animatedProgress, progress, easeInOut(t));
-                }
-                updateDockIcon()
-            }
-            return kCVReturnSuccess
-        }
-
-        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
-        CVDisplayLinkSetOutputCallback(displayLink!, displayLinkCallback, nil)
 	}
 
 	public static weak var progressInstance: Progress? {
@@ -71,10 +64,10 @@ public enum DockProgress {
 
     public static var progress: Double = 0 {
         didSet {
-            if let displayLink {
-                if CVDisplayLinkIsRunning(displayLink) == false {
-                    CVDisplayLinkStart(displayLink)
-                }
+            if progress > 0 {
+                displayLinkObserver.start()
+            } else {
+                updateDockIcon()
             }
         }
     }
@@ -85,9 +78,7 @@ public enum DockProgress {
 	Reset the `progress` without animating.
 	*/
 	public static func resetProgress() {
-        if let displayLink {
-            CVDisplayLinkStop(displayLink)
-        }
+        displayLinkObserver.stop()
 		progress = 0
         animatedProgress = 0
         t = 0;
@@ -272,6 +263,50 @@ public enum DockProgress {
 			return 0
 		}
 	}
+}
+
+private typealias DisplayLinkObserverCallback = (DisplayLinkObserver, Double) -> Void;
+
+private class DisplayLinkObserver {
+    private var displayLink: CVDisplayLink?
+    var callback: DisplayLinkObserverCallback
+    
+    init(_ callback: @escaping DisplayLinkObserverCallback) {
+        self.callback = callback
+        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+    }
+    
+    func start() {
+        if let displayLink {
+            CVDisplayLinkSetOutputCallback(
+                displayLink,
+                displayLinkOutputCallback,
+                UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+            )
+            CVDisplayLinkStart(displayLink)
+        }
+    }
+    
+    func stop() {
+        if let displayLink {
+            CVDisplayLinkStop(displayLink)
+        }
+    }
+}
+
+private func displayLinkOutputCallback(
+    displayLink: CVDisplayLink,
+    inNow: UnsafePointer<CVTimeStamp>,
+    inOutputTime: UnsafePointer<CVTimeStamp>,
+    flagsIn: CVOptionFlags,
+    flagsOut: UnsafeMutablePointer<CVOptionFlags>,
+    displayLinkContext: UnsafeMutableRawPointer?
+) -> CVReturn {
+    Task { @MainActor in
+        let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
+        observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
+    }
+    return kCVReturnSuccess
 }
 
 private func lerp(_ start: Double, _ end: Double, _ t: Double) -> Double {
