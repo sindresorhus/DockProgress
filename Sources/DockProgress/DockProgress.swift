@@ -18,6 +18,7 @@ public enum DockProgress {
                 if (animatedProgress - progress).magnitude <= 0.01 {
                     animatedProgress = progress
                     t = 0
+                    CVDisplayLinkStop(displayLink)
                 } else {
                     animatedProgress = lerp(animatedProgress, progress, easeInOut(t));
                 }
@@ -28,7 +29,6 @@ public enum DockProgress {
 
         CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
         CVDisplayLinkSetOutputCallback(displayLink!, displayLinkCallback, nil)
-        CVDisplayLinkStart(displayLink!)
 	}
 
 	public static weak var progressInstance: Progress? {
@@ -69,7 +69,15 @@ public enum DockProgress {
 		}
 	}
 
-	public static var progress: Double = 0
+    public static var progress: Double = 0 {
+        didSet {
+            if let displayLink {
+                if CVDisplayLinkIsRunning(displayLink) == false {
+                    CVDisplayLinkStart(displayLink)
+                }
+            }
+        }
+    }
     
     public private(set) static var animatedProgress: Double = 0
 
@@ -77,6 +85,9 @@ public enum DockProgress {
 	Reset the `progress` without animating.
 	*/
 	public static func resetProgress() {
+        if let displayLink {
+            CVDisplayLinkStop(displayLink)
+        }
 		progress = 0
         animatedProgress = 0
         t = 0;
