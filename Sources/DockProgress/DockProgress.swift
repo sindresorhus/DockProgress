@@ -1,13 +1,34 @@
 import Cocoa
+import CoreVideo
 
 @MainActor
 public enum DockProgress {
-	private static var previousProgress: Double = 0
+    private static var t: Double = 0;
+    private static var displayLink: CVDisplayLink?
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
 	private static let dockContentView = with(ContentView()) {
 		NSApp.dockTile.contentView = $0
+        
+        let displayLinkCallback: CVDisplayLinkOutputCallback = {(displayLink: CVDisplayLink, inNow: UnsafePointer<CVTimeStamp>, inOutputTime: UnsafePointer<CVTimeStamp>, flagsIn: CVOptionFlags, flagsOut: UnsafeMutablePointer<CVOptionFlags>, displayLinkContext: UnsafeMutableRawPointer?) -> CVReturn in
+            Task { @MainActor in
+                let speed = 1.0
+                t += speed * CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
+                if (animatedProgress - progress).magnitude <= 0.01 {
+                    animatedProgress = progress
+                    t = 0
+                } else {
+                    animatedProgress = lerp(animatedProgress, progress, easeInOut(t));
+                }
+                updateDockIcon()
+            }
+            return kCVReturnSuccess
+        }
+
+        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+        CVDisplayLinkSetOutputCallback(displayLink!, displayLinkCallback, nil)
+        CVDisplayLinkStart(displayLink!)
 	}
 
 	public static weak var progressInstance: Progress? {
@@ -48,26 +69,17 @@ public enum DockProgress {
 		}
 	}
 
-	public static var progress: Double = 0 {
-		didSet {
-			guard
-				previousProgress == 0
-					|| (progress - previousProgress).magnitude > 0.01
-			else {
-				return
-			}
-
-			previousProgress = progress
-			updateDockIcon()
-		}
-	}
+	public static var progress: Double = 0
+    
+    public private(set) static var animatedProgress: Double = 0
 
 	/**
 	Reset the `progress` without animating.
 	*/
 	public static func resetProgress() {
 		progress = 0
-		previousProgress = 0
+        animatedProgress = 0
+        t = 0;
 		updateDockIcon()
 	}
 
@@ -95,7 +107,7 @@ public enum DockProgress {
             NSApp.applicationIconImage?.draw(in: dirtyRect)
             
             // TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-            if (progress <= 0 || progress >= 1) {
+            if (animatedProgress <= 0 || animatedProgress >= 1) {
                 return
             }
 
@@ -130,7 +142,7 @@ public enum DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * progress
+		barProgress.size.width = barProgress.width * animatedProgress
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}
@@ -151,7 +163,7 @@ public enum DockProgress {
 		let progressSquircle = ProgressSquircleShapeLayer(rect: rect)
 		progressSquircle.strokeColor = color.cgColor
 		progressSquircle.lineWidth = 5
-		progressSquircle.progress = progress
+		progressSquircle.progress = animatedProgress
 		progressSquircle.render(in: cgContext)
 	}
 
@@ -163,7 +175,7 @@ public enum DockProgress {
 		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
-		progressCircle.progress = progress
+		progressCircle.progress = animatedProgress
 		progressCircle.render(in: cgContext)
 	}
 
@@ -191,7 +203,7 @@ public enum DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
-		progressCircle.progress = progress
+		progressCircle.progress = animatedProgress
 
 		// Label
 		if !isPie {
@@ -249,4 +261,21 @@ public enum DockProgress {
 			return 0
 		}
 	}
+}
+
+private func lerp(_ start: Double, _ end: Double, _ t: Double) -> Double {
+    return start + (end - start) * t
+}
+
+private func easeIn(_ t: Double) -> Double {
+    // Smoothstep, i.e. approximately iOS's default easing function (see https://stackoverflow.com/a/25728953)
+    return 3 * pow(t, 2) - 2 * pow(t, 3);
+}
+
+private func easeOut(_ t: Double) -> Double {
+    return 1 - easeIn(1 - t)
+}
+
+private func easeInOut(_ t: Double) -> Double {
+    return lerp(easeIn(t), easeOut(t), t)
 }
