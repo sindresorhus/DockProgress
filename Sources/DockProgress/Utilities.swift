@@ -1,5 +1,5 @@
 import Cocoa
-
+import simd
 
 /**
 Convenience function for initializing an object and modifying its properties.
@@ -268,4 +268,22 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		super.draw(in: context)
 		context.restoreGState()
 	}
+}
+
+enum Easing {
+    static func lerp(_ start: Double, _ end: Double, _ t: Double) -> Double {
+        return Double(simd_mix(Float(start), Float(end), Float(t)))
+    }
+
+    static private func easeIn(_ t: Double) -> Double {
+        return Double(simd_smoothstep(0.0, 1.0, Float(t)))
+    }
+
+    static private func easeOut(_ t: Double) -> Double {
+        return 1 - easeIn(1 - t)
+    }
+
+    static func easeInOut(_ t: Double) -> Double {
+        return lerp(easeIn(t), easeOut(t), t)
+    }
 }

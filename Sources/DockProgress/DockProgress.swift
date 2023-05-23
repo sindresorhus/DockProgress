@@ -15,7 +15,7 @@ public enum DockProgress {
             t = 0
             displayLinkObserver.stop()
         } else {
-            animatedProgress = lerp(animatedProgress, progress, easeInOut(t));
+            animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(t));
         }
         updateDockIcon()
     }
@@ -307,21 +307,4 @@ private func displayLinkOutputCallback(
         observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
     }
     return kCVReturnSuccess
-}
-
-private func lerp(_ start: Double, _ end: Double, _ t: Double) -> Double {
-    return start + (end - start) * t
-}
-
-private func easeIn(_ t: Double) -> Double {
-    // Smoothstep, i.e. approximately iOS's default easing function (see https://stackoverflow.com/a/25728953)
-    return 3 * pow(t, 2) - 2 * pow(t, 3);
-}
-
-private func easeOut(_ t: Double) -> Double {
-    return 1 - easeIn(1 - t)
-}
-
-private func easeInOut(_ t: Double) -> Double {
-    return lerp(easeIn(t), easeOut(t), t)
 }
