@@ -25,12 +25,12 @@ final class AppState: ObservableObject {
 		]
 
 		var stylesIterator = styles.makeIterator()
-        DockProgress.style = stylesIterator.next()!
-        
-        DockProgress.resetProgress()
+		DockProgress.style = stylesIterator.next()!
+		
+		DockProgress.resetProgress()
 
-        Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
-            DockProgress.progress += 0.2
+		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+			DockProgress.progress += 0.2
 
 			if DockProgress.animatedProgress >= 1 {
 				if let style = stylesIterator.next() {
