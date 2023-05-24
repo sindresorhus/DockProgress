@@ -1,4 +1,5 @@
 import Cocoa
+import CoreVideo
 import simd
 
 /**
@@ -287,3 +288,46 @@ enum Easing {
 		return lerp(easeIn(t), easeOut(t), t)
 	}
 }
+
+typealias DisplayLinkObserverCallback = (DisplayLinkObserver, Double) -> Void;
+
+class DisplayLinkObserver {
+	private var displayLink: CVDisplayLink?
+	var callback: DisplayLinkObserverCallback
+	
+	init(_ callback: @escaping DisplayLinkObserverCallback) {
+		self.callback = callback
+		CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+	}
+	
+	func start() {
+		if let displayLink {
+			CVDisplayLinkSetOutputCallback(
+				displayLink,
+				displayLinkOutputCallback,
+				UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+			)
+			CVDisplayLinkStart(displayLink)
+		}
+	}
+	
+	func stop() {
+		if let displayLink {
+			CVDisplayLinkStop(displayLink)
+		}
+	}
+}
+
+private func displayLinkOutputCallback(
+	displayLink: CVDisplayLink,
+	inNow: UnsafePointer<CVTimeStamp>,
+	inOutputTime: UnsafePointer<CVTimeStamp>,
+	flagsIn: CVOptionFlags,
+	flagsOut: UnsafeMutablePointer<CVOptionFlags>,
+	displayLinkContext: UnsafeMutableRawPointer?
+) -> CVReturn {
+	let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
+	observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
+	return kCVReturnSuccess
+}
+

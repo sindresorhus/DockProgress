@@ -1,5 +1,4 @@
 import Cocoa
-import CoreVideo
 
 @MainActor
 public enum DockProgress {
@@ -8,16 +7,18 @@ public enum DockProgress {
 
 	private static var t = 0.0
 	private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
-		let speed = 1.0
-		t += speed * refreshPeriod
-		if (animatedProgress - progress).magnitude <= 0.01 {
-			animatedProgress = progress
-			t = 0
-			displayLinkObserver.stop()
-		} else {
-			animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(t));
+		DispatchQueue.main.async {
+			let speed = 1.0
+			t += speed * refreshPeriod
+			if (animatedProgress - progress).magnitude <= 0.01 {
+				animatedProgress = progress
+				t = 0
+				displayLinkObserver.stop()
+			} else {
+				animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(t));
+			}
+			updateDockIcon()
 		}
-		updateDockIcon()
 	}
 
 	private static let dockContentView = with(ContentView()) {
@@ -263,48 +264,4 @@ public enum DockProgress {
 			return 0
 		}
 	}
-}
-
-private typealias DisplayLinkObserverCallback = (DisplayLinkObserver, Double) -> Void;
-
-private class DisplayLinkObserver {
-	private var displayLink: CVDisplayLink?
-	var callback: DisplayLinkObserverCallback
-	
-	init(_ callback: @escaping DisplayLinkObserverCallback) {
-		self.callback = callback
-		CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
-	}
-	
-	func start() {
-		if let displayLink {
-			CVDisplayLinkSetOutputCallback(
-				displayLink,
-				displayLinkOutputCallback,
-				UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-			)
-			CVDisplayLinkStart(displayLink)
-		}
-	}
-	
-	func stop() {
-		if let displayLink {
-			CVDisplayLinkStop(displayLink)
-		}
-	}
-}
-
-private func displayLinkOutputCallback(
-	displayLink: CVDisplayLink,
-	inNow: UnsafePointer<CVTimeStamp>,
-	inOutputTime: UnsafePointer<CVTimeStamp>,
-	flagsIn: CVOptionFlags,
-	flagsOut: UnsafeMutablePointer<CVOptionFlags>,
-	displayLinkContext: UnsafeMutableRawPointer?
-) -> CVReturn {
-	Task { @MainActor in
-		let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
-		observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
-	}
-	return kCVReturnSuccess
 }
