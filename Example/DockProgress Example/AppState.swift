@@ -20,17 +20,19 @@ final class AppState: ObservableObject {
 			.bar,
 			.squircle(color: .systemGray),
 			.circle(radius: 30, color: .white),
-			.badge(color: .systemBlue) { Int(DockProgress.progress * 12) },
+			.badge(color: .systemBlue) { Int(DockProgress.animatedProgress * 12) },
 			.pie(color: .systemBlue)
 		]
 
 		var stylesIterator = styles.makeIterator()
-		_ = stylesIterator.next()
+		DockProgress.style = stylesIterator.next()!
+		
+		DockProgress.resetProgress()
 
-		Timer.scheduledTimer(withTimeInterval: 0.02, repeats: true) { _ in
-			DockProgress.progress += 0.01
+		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
+			DockProgress.progress += 0.2
 
-			if DockProgress.progress > 1 {
+			if DockProgress.animatedProgress >= 1 {
 				if let style = stylesIterator.next() {
 					DockProgress.resetProgress()
 					DockProgress.style = style

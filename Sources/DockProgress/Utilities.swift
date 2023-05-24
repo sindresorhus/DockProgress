@@ -1,5 +1,6 @@
 import Cocoa
-
+import CoreVideo
+import simd
 
 /**
 Convenience function for initializing an object and modifying its properties.
@@ -268,4 +269,75 @@ final class VerticallyCenteredTextLayer: CATextLayer {
 		super.draw(in: context)
 		context.restoreGState()
 	}
+}
+
+enum Easing {
+	static func lerp(_ start: Double, _ end: Double, _ t: Double) -> Double {
+		return Double(simd_mix(Float(start), Float(end), Float(t)))
+	}
+
+	static private func easeIn(_ t: Double) -> Double {
+		return Double(simd_smoothstep(0.0, 1.0, Float(t)))
+	}
+
+	static private func easeOut(_ t: Double) -> Double {
+		return 1 - easeIn(1 - t)
+	}
+
+	static func easeInOut(_ t: Double) -> Double {
+		return lerp(easeIn(t), easeOut(t), t)
+	}
+}
+
+typealias DisplayLinkObserverCallback = (DisplayLinkObserver, Double) -> Void;
+
+class DisplayLinkObserver {
+	private var displayLink: CVDisplayLink?
+	var callback: DisplayLinkObserverCallback
+	
+	init(_ callback: @escaping DisplayLinkObserverCallback) {
+		self.callback = callback
+		let result = CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+		assert(result == kCVReturnSuccess, "Failed to create CVDisplayLink")
+	}
+	
+	func start() {
+		if let displayLink {
+			let result = CVDisplayLinkSetOutputCallback(
+				displayLink,
+				displayLinkOutputCallback,
+				UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+			)
+			assert(result == kCVReturnSuccess, "Failed to set CVDisplayLink output callback")
+			if (CVDisplayLinkStart(displayLink) != kCVReturnSuccess) {
+				print("Warning: CVDisplayLink already running")
+			}
+		}
+	}
+	
+	func stop() {
+		if let displayLink {
+			if (CVDisplayLinkStop(displayLink) != kCVReturnSuccess) {
+				print("Warning: CVDisplayLink already stopped")
+			}
+		}
+	}
+}
+
+private func displayLinkOutputCallback(
+	displayLink: CVDisplayLink,
+	inNow: UnsafePointer<CVTimeStamp>,
+	inOutputTime: UnsafePointer<CVTimeStamp>,
+	flagsIn: CVOptionFlags,
+	flagsOut: UnsafeMutablePointer<CVOptionFlags>,
+	displayLinkContext: UnsafeMutableRawPointer?
+) -> CVReturn {
+	let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
+	var refreshPeriod = CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
+	if (refreshPeriod == 0) {
+		print("Warning: CVDisplayLinkGetActualOutputVideoRefreshPeriod failed. Assuming 60 Hz...")
+		refreshPeriod = 1.0 / 60.0
+	}
+	observer.callback(observer, refreshPeriod)
+	return kCVReturnSuccess
 }

@@ -2,9 +2,24 @@ import Cocoa
 
 @MainActor
 public enum DockProgress {
-	private static var previousProgress: Double = 0
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
+
+	private static var elapsedTimeSinceLastRefresh = 0.0
+	private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
+		DispatchQueue.main.async {
+			let speed = 1.0
+			elapsedTimeSinceLastRefresh += speed * refreshPeriod
+			if (animatedProgress - progress).magnitude <= 0.01 {
+				animatedProgress = progress
+				elapsedTimeSinceLastRefresh = 0
+				displayLinkObserver.stop()
+			} else {
+				animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(elapsedTimeSinceLastRefresh));
+			}
+			updateDockIcon()
+		}
+	}
 
 	private static let dockContentView = with(ContentView()) {
 		NSApp.dockTile.contentView = $0
@@ -50,24 +65,27 @@ public enum DockProgress {
 
 	public static var progress: Double = 0 {
 		didSet {
-			guard
-				previousProgress == 0
-					|| (progress - previousProgress).magnitude > 0.01
-			else {
-				return
+			if progress > 0 {
+				displayLinkObserver.start()
+			} else {
+				updateDockIcon()
 			}
-
-			previousProgress = progress
-			updateDockIcon()
 		}
 	}
+	
+	/**
+	The currently displayed progress (readonly). Animates towards `progress`
+	*/
+	public private(set) static var animatedProgress = 0.0
 
 	/**
 	Reset the `progress` without animating.
 	*/
 	public static func resetProgress() {
+		displayLinkObserver.stop()
 		progress = 0
-		previousProgress = 0
+		animatedProgress = 0
+		elapsedTimeSinceLastRefresh = 0;
 		updateDockIcon()
 	}
 
@@ -84,37 +102,37 @@ public enum DockProgress {
 
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
-        dockContentView.needsDisplay = true;
+		dockContentView.needsDisplay = true;
 		NSApp.dockTile.display()
 	}
-    
-    private class ContentView: NSView {
-        override func draw(_ dirtyRect: NSRect) {
-            NSGraphicsContext.current?.imageInterpolation = .high
-            
-            NSApp.applicationIconImage?.draw(in: dirtyRect)
-            
-            // TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-            if (progress <= 0 || progress >= 1) {
-                return
-            }
+	
+	private class ContentView: NSView {
+		override func draw(_ dirtyRect: NSRect) {
+			NSGraphicsContext.current?.imageInterpolation = .high
+			
+			NSApp.applicationIconImage?.draw(in: dirtyRect)
+			
+			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
+			if (animatedProgress <= 0 || animatedProgress >= 1) {
+				return
+			}
 
-            switch style {
-            case .bar:
-                drawProgressBar(dirtyRect)
-            case .squircle(let inset, let color):
-                drawProgressSquircle(dirtyRect, inset: inset, color: color)
-            case .circle(let radius, let color):
-                drawProgressCircle(dirtyRect, radius: radius, color: color)
-            case .badge(let color, let badgeValue):
-                drawProgressBadge(dirtyRect, color: color, badgeLabel: badgeValue())
-            case .pie(let color):
-                drawProgressBadge(dirtyRect, color: color, badgeLabel: 0, isPie: true)
-            case .custom(let drawingHandler):
-                drawingHandler(dirtyRect)
-            }
-        }
-    }
+			switch style {
+			case .bar:
+				drawProgressBar(dirtyRect)
+			case .squircle(let inset, let color):
+				drawProgressSquircle(dirtyRect, inset: inset, color: color)
+			case .circle(let radius, let color):
+				drawProgressCircle(dirtyRect, radius: radius, color: color)
+			case .badge(let color, let badgeValue):
+				drawProgressBadge(dirtyRect, color: color, badgeLabel: badgeValue())
+			case .pie(let color):
+				drawProgressBadge(dirtyRect, color: color, badgeLabel: 0, isPie: true)
+			case .custom(let drawingHandler):
+				drawingHandler(dirtyRect)
+			}
+		}
+	}
 
 	private static func drawProgressBar(_ dstRect: CGRect) {
 		func roundedRect(_ rect: CGRect) {
@@ -130,7 +148,7 @@ public enum DockProgress {
 		roundedRect(barInnerBg)
 
 		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * progress
+		barProgress.size.width = barProgress.width * animatedProgress
 		NSColor.white.set()
 		roundedRect(barProgress)
 	}
@@ -151,7 +169,7 @@ public enum DockProgress {
 		let progressSquircle = ProgressSquircleShapeLayer(rect: rect)
 		progressSquircle.strokeColor = color.cgColor
 		progressSquircle.lineWidth = 5
-		progressSquircle.progress = progress
+		progressSquircle.progress = animatedProgress
 		progressSquircle.render(in: cgContext)
 	}
 
@@ -163,7 +181,7 @@ public enum DockProgress {
 		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = 4
-		progressCircle.progress = progress
+		progressCircle.progress = animatedProgress
 		progressCircle.render(in: cgContext)
 	}
 
@@ -191,7 +209,7 @@ public enum DockProgress {
 		progressCircle.strokeColor = color.cgColor
 		progressCircle.lineWidth = lineWidth
 		progressCircle.lineCap = .butt
-		progressCircle.progress = progress
+		progressCircle.progress = animatedProgress
 
 		// Label
 		if !isPie {
