@@ -2,10 +2,6 @@
 
 > Show progress in your app's Dock icon
 
-<img src="screenshot.gif" width="485">
-
-This package is used in production by the [Gifski app](https://github.com/sindresorhus/Gifski). You may also like some of my [other apps](https://sindresorhus.com/apps).
-
 ## Requirements
 
 macOS 10.15+
@@ -15,6 +11,10 @@ macOS 10.15+
 Add `https://github.com/sindresorhus/DockProgress` in the [“Swift Package Manager” tab in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
 *Latest version: 4.2.0*
+
+## API
+
+[See the API docs.](https://swiftpackageindex.com/sindresorhus/DockProgress/documentation/dockprogress/dockprogress)
 
 ## Usage
 
@@ -113,4 +113,4 @@ DockProgress.style = .pie(color: .systemBlue)
 - [Defaults](https://github.com/sindresorhus/Defaults) - Swifty and modern UserDefaults
 - [KeyboardShortcuts](https://github.com/sindresorhus/KeyboardShortcuts) - Add user-customizable global keyboard shortcuts to your macOS app
 - [LaunchAtLogin](https://github.com/sindresorhus/LaunchAtLogin) - Add "Launch at Login" functionality to your macOS app
-- [More…](https://github.com/search?q=user%3Asindresorhus+language%3Aswift)
+- [More…](https://github.com/search?q=user%3Asindresorhus+language%3Aswift+archived%3Afalse&type=repositories)
