@@ -73,6 +73,9 @@ public enum DockProgress {
 		}
 	}
 	
+	/**
+	The currently displayed progress (readonly). Animates towards `progress`
+	*/
 	public private(set) static var animatedProgress = 0.0
 
 	/**
