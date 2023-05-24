@@ -5,17 +5,17 @@ public enum DockProgress {
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
-	private static var t = 0.0
+	private static var elapsedTimeSinceLastRefresh = 0.0
 	private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
 		DispatchQueue.main.async {
 			let speed = 1.0
-			t += speed * refreshPeriod
+			elapsedTimeSinceLastRefresh += speed * refreshPeriod
 			if (animatedProgress - progress).magnitude <= 0.01 {
 				animatedProgress = progress
-				t = 0
+				elapsedTimeSinceLastRefresh = 0
 				displayLinkObserver.stop()
 			} else {
-				animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(t));
+				animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(elapsedTimeSinceLastRefresh));
 			}
 			updateDockIcon()
 		}
@@ -82,7 +82,7 @@ public enum DockProgress {
 		displayLinkObserver.stop()
 		progress = 0
 		animatedProgress = 0
-		t = 0;
+		elapsedTimeSinceLastRefresh = 0;
 		updateDockIcon()
 	}
 
