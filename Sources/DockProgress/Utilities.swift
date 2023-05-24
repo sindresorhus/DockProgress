@@ -297,23 +297,29 @@ class DisplayLinkObserver {
 	
 	init(_ callback: @escaping DisplayLinkObserverCallback) {
 		self.callback = callback
-		CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+		let result = CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+		assert(result == kCVReturnSuccess, "Failed to create CVDisplayLink")
 	}
 	
 	func start() {
 		if let displayLink {
-			CVDisplayLinkSetOutputCallback(
+			let result = CVDisplayLinkSetOutputCallback(
 				displayLink,
 				displayLinkOutputCallback,
 				UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
 			)
-			CVDisplayLinkStart(displayLink)
+			assert(result == kCVReturnSuccess, "Failed to set CVDisplayLink output callback")
+			if (CVDisplayLinkStart(displayLink) != kCVReturnSuccess) {
+				print("Warning: CVDisplayLink already running")
+			}
 		}
 	}
 	
 	func stop() {
 		if let displayLink {
-			CVDisplayLinkStop(displayLink)
+			if (CVDisplayLinkStop(displayLink) != kCVReturnSuccess) {
+				print("Warning: CVDisplayLink already stopped")
+			}
 		}
 	}
 }
@@ -327,7 +333,11 @@ private func displayLinkOutputCallback(
 	displayLinkContext: UnsafeMutableRawPointer?
 ) -> CVReturn {
 	let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
-	observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
+	var refreshPeriod = CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
+	if (refreshPeriod == 0) {
+		print("Warning: CVDisplayLinkGetActualOutputVideoRefreshPeriod failed. Assuming 30 Hz...")
+		refreshPeriod = 1.0 / 30.0
+	}
+	observer.callback(observer, refreshPeriod)
 	return kCVReturnSuccess
 }
-
