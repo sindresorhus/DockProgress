@@ -335,8 +335,8 @@ private func displayLinkOutputCallback(
 	let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
 	var refreshPeriod = CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
 	if (refreshPeriod == 0) {
-		print("Warning: CVDisplayLinkGetActualOutputVideoRefreshPeriod failed. Assuming 30 Hz...")
-		refreshPeriod = 1.0 / 30.0
+		print("Warning: CVDisplayLinkGetActualOutputVideoRefreshPeriod failed. Assuming 60 Hz...")
+		refreshPeriod = 1.0 / 60.0
 	}
 	observer.callback(observer, refreshPeriod)
 	return kCVReturnSuccess
