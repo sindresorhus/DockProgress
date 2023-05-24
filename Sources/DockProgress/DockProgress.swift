@@ -6,19 +6,19 @@ public enum DockProgress {
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 
-    private static var t = 0.0
-    private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
-        let speed = 1.0
-        t += speed * refreshPeriod
-        if (animatedProgress - progress).magnitude <= 0.01 {
-            animatedProgress = progress
-            t = 0
-            displayLinkObserver.stop()
-        } else {
-            animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(t));
-        }
-        updateDockIcon()
-    }
+	private static var t = 0.0
+	private static var displayLinkObserver = DisplayLinkObserver { (displayLinkObserver, refreshPeriod) in
+		let speed = 1.0
+		t += speed * refreshPeriod
+		if (animatedProgress - progress).magnitude <= 0.01 {
+			animatedProgress = progress
+			t = 0
+			displayLinkObserver.stop()
+		} else {
+			animatedProgress = Easing.lerp(animatedProgress, progress, Easing.easeInOut(t));
+		}
+		updateDockIcon()
+	}
 
 	private static let dockContentView = with(ContentView()) {
 		NSApp.dockTile.contentView = $0
@@ -62,26 +62,26 @@ public enum DockProgress {
 		}
 	}
 
-    public static var progress: Double = 0 {
-        didSet {
-            if progress > 0 {
-                displayLinkObserver.start()
-            } else {
-                updateDockIcon()
-            }
-        }
-    }
-    
-    public private(set) static var animatedProgress = 0.0
+	public static var progress: Double = 0 {
+		didSet {
+			if progress > 0 {
+				displayLinkObserver.start()
+			} else {
+				updateDockIcon()
+			}
+		}
+	}
+	
+	public private(set) static var animatedProgress = 0.0
 
 	/**
 	Reset the `progress` without animating.
 	*/
 	public static func resetProgress() {
-        displayLinkObserver.stop()
+		displayLinkObserver.stop()
 		progress = 0
-        animatedProgress = 0
-        t = 0;
+		animatedProgress = 0
+		t = 0;
 		updateDockIcon()
 	}
 
@@ -98,37 +98,37 @@ public enum DockProgress {
 
 	// TODO: Make the progress smoother by also animating the steps between each call to `updateDockIcon()`
 	private static func updateDockIcon() {
-        dockContentView.needsDisplay = true;
+		dockContentView.needsDisplay = true;
 		NSApp.dockTile.display()
 	}
-    
-    private class ContentView: NSView {
-        override func draw(_ dirtyRect: NSRect) {
-            NSGraphicsContext.current?.imageInterpolation = .high
-            
-            NSApp.applicationIconImage?.draw(in: dirtyRect)
-            
-            // TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-            if (animatedProgress <= 0 || animatedProgress >= 1) {
-                return
-            }
+	
+	private class ContentView: NSView {
+		override func draw(_ dirtyRect: NSRect) {
+			NSGraphicsContext.current?.imageInterpolation = .high
+			
+			NSApp.applicationIconImage?.draw(in: dirtyRect)
+			
+			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
+			if (animatedProgress <= 0 || animatedProgress >= 1) {
+				return
+			}
 
-            switch style {
-            case .bar:
-                drawProgressBar(dirtyRect)
-            case .squircle(let inset, let color):
-                drawProgressSquircle(dirtyRect, inset: inset, color: color)
-            case .circle(let radius, let color):
-                drawProgressCircle(dirtyRect, radius: radius, color: color)
-            case .badge(let color, let badgeValue):
-                drawProgressBadge(dirtyRect, color: color, badgeLabel: badgeValue())
-            case .pie(let color):
-                drawProgressBadge(dirtyRect, color: color, badgeLabel: 0, isPie: true)
-            case .custom(let drawingHandler):
-                drawingHandler(dirtyRect)
-            }
-        }
-    }
+			switch style {
+			case .bar:
+				drawProgressBar(dirtyRect)
+			case .squircle(let inset, let color):
+				drawProgressSquircle(dirtyRect, inset: inset, color: color)
+			case .circle(let radius, let color):
+				drawProgressCircle(dirtyRect, radius: radius, color: color)
+			case .badge(let color, let badgeValue):
+				drawProgressBadge(dirtyRect, color: color, badgeLabel: badgeValue())
+			case .pie(let color):
+				drawProgressBadge(dirtyRect, color: color, badgeLabel: 0, isPie: true)
+			case .custom(let drawingHandler):
+				drawingHandler(dirtyRect)
+			}
+		}
+	}
 
 	private static func drawProgressBar(_ dstRect: CGRect) {
 		func roundedRect(_ rect: CGRect) {
@@ -268,43 +268,43 @@ public enum DockProgress {
 private typealias DisplayLinkObserverCallback = (DisplayLinkObserver, Double) -> Void;
 
 private class DisplayLinkObserver {
-    private var displayLink: CVDisplayLink?
-    var callback: DisplayLinkObserverCallback
-    
-    init(_ callback: @escaping DisplayLinkObserverCallback) {
-        self.callback = callback
-        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
-    }
-    
-    func start() {
-        if let displayLink {
-            CVDisplayLinkSetOutputCallback(
-                displayLink,
-                displayLinkOutputCallback,
-                UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
-            )
-            CVDisplayLinkStart(displayLink)
-        }
-    }
-    
-    func stop() {
-        if let displayLink {
-            CVDisplayLinkStop(displayLink)
-        }
-    }
+	private var displayLink: CVDisplayLink?
+	var callback: DisplayLinkObserverCallback
+	
+	init(_ callback: @escaping DisplayLinkObserverCallback) {
+		self.callback = callback
+		CVDisplayLinkCreateWithActiveCGDisplays(&displayLink)
+	}
+	
+	func start() {
+		if let displayLink {
+			CVDisplayLinkSetOutputCallback(
+				displayLink,
+				displayLinkOutputCallback,
+				UnsafeMutableRawPointer(Unmanaged.passUnretained(self).toOpaque())
+			)
+			CVDisplayLinkStart(displayLink)
+		}
+	}
+	
+	func stop() {
+		if let displayLink {
+			CVDisplayLinkStop(displayLink)
+		}
+	}
 }
 
 private func displayLinkOutputCallback(
-    displayLink: CVDisplayLink,
-    inNow: UnsafePointer<CVTimeStamp>,
-    inOutputTime: UnsafePointer<CVTimeStamp>,
-    flagsIn: CVOptionFlags,
-    flagsOut: UnsafeMutablePointer<CVOptionFlags>,
-    displayLinkContext: UnsafeMutableRawPointer?
+	displayLink: CVDisplayLink,
+	inNow: UnsafePointer<CVTimeStamp>,
+	inOutputTime: UnsafePointer<CVTimeStamp>,
+	flagsIn: CVOptionFlags,
+	flagsOut: UnsafeMutablePointer<CVOptionFlags>,
+	displayLinkContext: UnsafeMutableRawPointer?
 ) -> CVReturn {
-    Task { @MainActor in
-        let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
-        observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
-    }
-    return kCVReturnSuccess
+	Task { @MainActor in
+		let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
+		observer.callback(observer, CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink))
+	}
+	return kCVReturnSuccess
 }
