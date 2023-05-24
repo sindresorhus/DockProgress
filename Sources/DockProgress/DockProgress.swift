@@ -72,7 +72,7 @@ public enum DockProgress {
         }
     }
     
-    public private(set) static var animatedProgress: Double = 0
+    public private(set) static var animatedProgress = 0.0
 
 	/**
 	Reset the `progress` without animating.
