@@ -11,6 +11,7 @@ public enum DockProgress {
 	private static var finishedObserver: NSKeyValueObservation?
 	private static var elapsedTimeSinceLastRefresh = 0.0
 
+	// TODO: Use `CADisplayLink` on macOS 14.
 	private static var displayLinkObserver = DisplayLinkObserver { displayLinkObserver, refreshPeriod in
 		DispatchQueue.main.async {
 			let speed = 1.0
@@ -218,10 +219,10 @@ public enum DockProgress {
 	}
 	
 	private final class ContentView: NSView {
-		override func draw(_ dirtyRect: NSRect) {
+		override func draw(_ dirtyRect: CGRect) {
 			NSGraphicsContext.current?.imageInterpolation = .high
 			
-			NSApp.applicationIconImage?.draw(in: dirtyRect)
+			NSApp.applicationIconImage?.draw(in: bounds)
 			
 			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
 			guard
@@ -233,17 +234,17 @@ public enum DockProgress {
 
 			switch style {
 			case .bar:
-				drawProgressBar(dirtyRect)
+				drawProgressBar(bounds)
 			case .squircle(let inset, let color):
-				drawProgressSquircle(dirtyRect, inset: inset, color: color)
+				drawProgressSquircle(bounds, inset: inset, color: color)
 			case .circle(let radius, let color):
-				drawProgressCircle(dirtyRect, radius: radius, color: color)
+				drawProgressCircle(bounds, radius: radius, color: color)
 			case .badge(let color, let badgeValue):
-				drawProgressBadge(dirtyRect, color: color, badgeLabel: badgeValue())
+				drawProgressBadge(bounds, color: color, badgeLabel: badgeValue())
 			case .pie(let color):
-				drawProgressBadge(dirtyRect, color: color, badgeLabel: 0, isPie: true)
+				drawProgressBadge(bounds, color: color, badgeLabel: 0, isPie: true)
 			case .custom(let drawingHandler):
-				drawingHandler(dirtyRect)
+				drawingHandler(bounds)
 			}
 		}
 	}
