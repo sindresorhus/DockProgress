@@ -10,7 +10,7 @@ macOS 10.15+
 
 Add `https://github.com/sindresorhus/DockProgress` in the [“Swift Package Manager” tab in Xcode](https://developer.apple.com/documentation/xcode/adding_package_dependencies_to_your_app).
 
-*Latest version: 4.2.1*
+*Latest version: 4.2.2*
 
 ## API
 
