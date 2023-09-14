@@ -349,7 +349,12 @@ final class DisplayLinkObserver {
 	
 	init(_ callback: @escaping (DisplayLinkObserver, Double) -> Void) {
 		self.callback = callback
-		assert(CVDisplayLinkCreateWithActiveCGDisplays(&displayLink) == kCVReturnSuccess, "Failed to create CVDisplayLink")
+
+		guard CVDisplayLinkCreateWithActiveCGDisplays(&displayLink) == kCVReturnSuccess else {
+			assertionFailure("Failed to create CVDisplayLink")
+			print("Failed to create CVDisplayLink")
+			return
+		}
 	}
 
 	deinit {
