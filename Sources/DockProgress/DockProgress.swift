@@ -64,7 +64,7 @@ public enum DockProgress {
 				return
 			}
 
-			// TODO: Use AsyncSequence when targeting macOS 12.
+			// TODO: Use AsyncSequence when targeting macOS 15.
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
 				Task { @MainActor in
 					guard
@@ -113,7 +113,7 @@ public enum DockProgress {
 			}
 		}
 	}
-	
+
 	/**
 	The currently displayed progress. Animates towards ``progress``.
 	*/
@@ -131,80 +131,6 @@ public enum DockProgress {
 	}
 
 	/**
-	The available progress styles.
-
-	- `.bar` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-bar.gif?raw=true)
-	- `.squircle` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
-	- `.circle` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
-	- `.badge` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
-	- `.pie` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
-	*/
-	public enum Style {
-		/**
-		Progress bar style.
-
-		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-bar.gif?raw=true)
-		*/
-		case bar
-
-		/**
-		Progress line animating around the edges of the app icon.
-
-		- Parameters:
-			- inset: Inset value to adjust the squircle shape. By default, it should fit a normal macOS icon.
-			- color: The color of the progress.
-
-		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
-		*/
-		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
-
-		/**
-		Circle style.
-
-		- Parameters:
-			- radius: The radius of the circle.
-			- color: The color of the progress.
-
-		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
-		*/
-		case circle(radius: Double, color: NSColor = .controlAccentColor)
-
-		/**
-		Badge style.
-
-		- Parameters:
-			- color: The color of the badge.
-			- badgeValue: A closure that returns the badge value as an integer.
-
-		- Note: It is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
-
-		Large badge value numbers will be written in kilo short notation, for example, `1012` → `1k`.
-
-		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
-		*/
-		case badge(color: NSColor = .controlAccentColor, badgeValue: () -> Int)
-
-		/**
-		Pie style.
-
-		- Parameters:
-			- color: The color of the pie.
-
-		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
-		*/
-		case pie(color: NSColor = .controlAccentColor)
-
-
-		/**
-		Custom style.
-
-		- Parameters:
-			- drawHandler: A closure that is responsible for drawing the custom progress.
-		*/
-		case custom(drawHandler: (_ rect: CGRect) -> Void)
-	}
-
-	/**
 	The style to be used for displaying progress.
 
 	The default style is `.bar`.
@@ -217,13 +143,13 @@ public enum DockProgress {
 		dockContentView.needsDisplay = true
 		NSApp.dockTile.display()
 	}
-	
+
 	private final class ContentView: NSView {
 		override func draw(_ dirtyRect: CGRect) {
 			NSGraphicsContext.current?.imageInterpolation = .high
-			
+
 			NSApp.applicationIconImage?.draw(in: bounds)
-			
+
 			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
 			guard
 				displayedProgress > 0,
@@ -373,15 +299,91 @@ public enum DockProgress {
 	private static func scaledBadgeFontSize(text: String) -> Double {
 		switch text.count {
 		case 1:
-			return 30
+			30
 		case 2:
-			return 23
+			23
 		case 3:
-			return 19
+			19
 		case 4:
-			return 15
+			15
 		default:
-			return 0
+			0
 		}
+	}
+}
+
+extension DockProgress {
+	/**
+	The available progress styles.
+
+	- `.bar` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-bar.gif?raw=true)
+	- `.squircle` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
+	- `.circle` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
+	- `.badge` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
+	- `.pie` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
+	*/
+	public enum Style {
+		/**
+		Progress bar style.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-bar.gif?raw=true)
+		*/
+		case bar
+
+		/**
+		Progress line animating around the edges of the app icon.
+
+		- Parameters:
+			- inset: Inset value to adjust the squircle shape. By default, it should fit a normal macOS icon.
+			- color: The color of the progress.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
+		*/
+		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
+
+		/**
+		Circle style.
+
+		- Parameters:
+			- radius: The radius of the circle.
+			- color: The color of the progress.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
+		*/
+		case circle(radius: Double, color: NSColor = .controlAccentColor)
+
+		/**
+		Badge style.
+
+		- Parameters:
+			- color: The color of the badge.
+			- badgeValue: A closure that returns the badge value as an integer.
+
+		- Note: It is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
+
+		Large badge value numbers will be written in kilo short notation, for example, `1012` → `1k`.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
+		*/
+		case badge(color: NSColor = .controlAccentColor, badgeValue: () -> Int)
+
+		/**
+		Pie style.
+
+		- Parameters:
+			- color: The color of the pie.
+
+		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
+		*/
+		case pie(color: NSColor = .controlAccentColor)
+
+
+		/**
+		Custom style.
+
+		- Parameters:
+			- drawHandler: A closure that is responsible for drawing the custom progress.
+		*/
+		case custom(drawHandler: (_ rect: CGRect) -> Void)
 	}
 }

@@ -2,7 +2,7 @@ import SwiftUI
 import DockProgress
 
 @MainActor
-final class AppState: ObservableObject {
+final class AppState {
 	init() {
 		DispatchQueue.main.async { [self] in
 			didLaunch()
@@ -26,7 +26,7 @@ final class AppState: ObservableObject {
 
 		var stylesIterator = styles.makeIterator()
 		DockProgress.style = stylesIterator.next()!
-		
+
 		DockProgress.resetProgress()
 
 		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in

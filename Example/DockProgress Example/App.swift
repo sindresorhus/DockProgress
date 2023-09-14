@@ -1,8 +1,9 @@
 import SwiftUI
 
+@MainActor
 @main
 struct AppMain: App {
-	@StateObject private var appState = AppState()
+	private let appState = AppState()
 
 	var body: some Scene {
 		WindowGroup {

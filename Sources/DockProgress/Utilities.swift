@@ -88,7 +88,7 @@ final class ProgressSquircleShapeLayer: CAShapeLayer {
 			.squircle(rect: rect)
 			.rotating(byRadians: .pi, centerPoint: rect.center)
 			.reversed
-			.cgPath
+			.ss_cgPath
 
 		path = cgPath
 		bounds = cgPath.boundingBox
@@ -131,7 +131,7 @@ final class ProgressCircleShapeLayer: CAShapeLayer {
 		position = center
 		strokeEnd = 0
 
-		let cgPath = NSBezierPath.progressCircle(radius: radius, center: center).cgPath
+		let cgPath = NSBezierPath.progressCircle(radius: radius, center: center).ss_cgPath
 		path = cgPath
 		bounds = cgPath.boundingBox
 	}
@@ -175,7 +175,11 @@ extension NSBezierPath {
 	/**
 	UIKit polyfill.
 	*/
-	var cgPath: CGPath {
+	var ss_cgPath: CGPath {
+		if #available(macOS 14, *) {
+			return cgPath
+		}
+
 		let path = CGMutablePath()
 		var points = [CGPoint](repeating: .zero, count: 3)
 
@@ -190,8 +194,8 @@ extension NSBezierPath {
 				path.addCurve(to: points[2], control1: points[0], control2: points[1])
 			case .closePath:
 				path.closeSubpath()
-			@unknown default:
-				assertionFailure("NSBezierPath received a new enum case. Please handle it.")
+			default:
+				continue
 			}
 		}
 
@@ -346,7 +350,7 @@ This is useful for creating smooth animations that synchronize with the screen's
 final class DisplayLinkObserver {
 	private var displayLink: CVDisplayLink?
 	fileprivate let callback: (DisplayLinkObserver, Double) -> Void
-	
+
 	init(_ callback: @escaping (DisplayLinkObserver, Double) -> Void) {
 		self.callback = callback
 
@@ -360,7 +364,7 @@ final class DisplayLinkObserver {
 	deinit {
 		stop()
 	}
-	
+
 	func start() {
 		guard let displayLink else {
 			return
@@ -375,7 +379,7 @@ final class DisplayLinkObserver {
 
 		CVDisplayLinkStart(displayLink)
 	}
-	
+
 	func stop() {
 		guard let displayLink else {
 			return
@@ -396,7 +400,7 @@ private func displayLinkOutputCallback(
 	let observer = unsafeBitCast(displayLinkContext, to: DisplayLinkObserver.self)
 
 	var refreshPeriod = CVDisplayLinkGetActualOutputVideoRefreshPeriod(displayLink)
-	if (refreshPeriod == 0) {
+	if refreshPeriod == 0 {
 		print("Warning: CVDisplayLinkGetActualOutputVideoRefreshPeriod failed. Assuming 60 Hz...")
 		refreshPeriod = 1.0 / 60.0
 	}
