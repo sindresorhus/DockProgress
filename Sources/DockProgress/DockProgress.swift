@@ -322,7 +322,7 @@ extension DockProgress {
 	- `.badge` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
 	- `.pie` ![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
 	*/
-	public enum Style {
+	public enum Style: Sendable {
 		/**
 		Progress bar style.
 
@@ -365,7 +365,7 @@ extension DockProgress {
 
 		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
 		*/
-		case badge(color: NSColor = .controlAccentColor, badgeValue: () -> Int)
+		case badge(color: NSColor = .controlAccentColor, badgeValue: @MainActor @Sendable () -> Int)
 
 		/**
 		Pie style.
@@ -384,6 +384,6 @@ extension DockProgress {
 		- Parameters:
 			- drawHandler: A closure that is responsible for drawing the custom progress.
 		*/
-		case custom(drawHandler: (_ rect: CGRect) -> Void)
+		case custom(drawHandler: @MainActor @Sendable (_ rect: CGRect) -> Void)
 	}
 }
