@@ -107,6 +107,7 @@ public enum DockProgress {
 	public static var progress: Double = 0 {
 		didSet {
 			if progress > 0 {
+				NSApp.dockTile.contentView = dockContentView
 				displayLinkObserver.start()
 			} else {
 				updateDockIcon()
@@ -117,7 +118,13 @@ public enum DockProgress {
 	/**
 	The currently displayed progress. Animates towards ``progress``.
 	*/
-	public private(set) static var displayedProgress = 0.0
+	public private(set) static var displayedProgress = 0.0 {
+		didSet {
+			if displayedProgress == 0 || displayedProgress >= 1 {
+				NSApp.dockTile.contentView = nil
+			}
+ 		}
+	}
 
 	/**
 	Reset the progress without animating.
