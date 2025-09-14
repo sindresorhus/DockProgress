@@ -14,7 +14,10 @@ let label = with(NSTextField()) {
 ```
 */
 @discardableResult
-func with<T>(_ item: T, update: (inout T) throws -> Void) rethrows -> T {
+func with<T, E>(
+	_ item: T,
+	update: (inout T) throws(E) -> Void
+) throws(E) -> T {
 	var this = item
 	try update(&this)
 	return this
