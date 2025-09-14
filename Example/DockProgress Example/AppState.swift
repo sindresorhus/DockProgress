@@ -18,10 +18,13 @@ final class AppState {
 
 		let styles: [DockProgress.Style] = [
 			.bar,
-			.squircle(color: .systemGray),
+			.squircle(color: .gray),
 			.circle(radius: 30, color: .white),
-			.badge(color: .systemBlue) { Int(DockProgress.displayedProgress * 12) },
-			.pie(color: .systemBlue)
+			.badge(color: .blue) { Int(DockProgress.displayedProgress * 12) },
+			.pie(color: .blue),
+			.customView { progress in
+				CustomView(progress: progress)
+			}
 		]
 
 		var stylesIterator = styles.makeIterator()
@@ -47,8 +50,51 @@ final class AppState {
 	}
 
 	private func borrowIconFromApp(_ app: String) {
-		let icon = NSWorkspace.shared.icon(forFile: NSWorkspace.shared.urlForApplication(withBundleIdentifier: app)!.path)
+		guard let appURL = NSWorkspace.shared.urlForApplication(withBundleIdentifier: app) else {
+			return
+		}
+
+		let icon = NSWorkspace.shared.icon(forFile: appURL.path)
 		icon.size = CGSize(width: 128, height: 128)
-		NSApp.applicationIconImage = icon
+
+		// Reduce flicker by checking if icon actually changed
+		if NSApp.applicationIconImage != icon {
+			NSApp.applicationIconImage = icon
+		}
+	}
+}
+
+private struct CustomView: View {
+	let progress: Double
+
+	var body: some View {
+		ZStack {
+			Circle()
+				.stroke(
+					LinearGradient(
+						colors: [.blue, .purple],
+						startPoint: .top,
+						endPoint: .bottom
+					),
+					lineWidth: 8
+				)
+				.opacity(0.3)
+				.frame(width: 80, height: 80)
+			Circle()
+				.trim(from: 0, to: progress)
+				.stroke(
+					LinearGradient(
+						colors: [.blue, .purple],
+						startPoint: .top,
+						endPoint: .bottom
+					),
+					style: StrokeStyle(lineWidth: 8, lineCap: .round)
+				)
+				.rotationEffect(.degrees(-90))
+				.frame(width: 80, height: 80)
+			Text("\(Int(progress * 100))%")
+				.font(.system(size: 20, weight: .bold).monospacedDigit())
+				.foregroundColor(.white)
+		}
 	}
 }

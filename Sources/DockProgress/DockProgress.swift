@@ -1,4 +1,5 @@
 import Cocoa
+import SwiftUI
 
 /**
 Show progress in your app's Dock icon.
@@ -12,8 +13,8 @@ public enum DockProgress {
 	private static var elapsedTimeSinceLastRefresh = 0.0
 
 	// TODO: Use `CADisplayLink` on macOS 14.
-	private static var displayLinkObserver = DisplayLinkObserver { displayLinkObserver, refreshPeriod in
-		DispatchQueue.main.async {
+	private static var displayLinkObserver: DisplayLinkObserver = {
+		DisplayLinkObserver { observer, refreshPeriod in
 			let speed = 1.0
 
 			elapsedTimeSinceLastRefresh += speed * refreshPeriod
@@ -21,7 +22,7 @@ public enum DockProgress {
 			if (displayedProgress - progress).magnitude <= 0.01 {
 				displayedProgress = progress
 				elapsedTimeSinceLastRefresh = 0
-				displayLinkObserver.stop()
+				observer.stop()
 			} else {
 				displayedProgress = Easing.linearInterpolation(
 					start: displayedProgress,
@@ -32,11 +33,13 @@ public enum DockProgress {
 
 			updateDockIcon()
 		}
-	}
+	}()
 
-	private static let dockContentView = with(ContentView()) {
-		NSApp.dockTile.contentView = $0
-	}
+	private static let dockContentView: ContentView = {
+		let view = ContentView()
+		NSApp?.dockTile.contentView = view
+		return view
+	}()
 
 	/**
 	Assign a [`Progress`](https://developer.apple.com/documentation/foundation/progress) instance to track the progress status.
@@ -107,7 +110,7 @@ public enum DockProgress {
 	public static var progress: Double = 0 {
 		didSet {
 			if progress > 0 {
-				NSApp.dockTile.contentView = dockContentView
+				NSApp?.dockTile.contentView = dockContentView
 				displayLinkObserver.start()
 			} else {
 				updateDockIcon()
@@ -121,9 +124,9 @@ public enum DockProgress {
 	public private(set) static var displayedProgress = 0.0 {
 		didSet {
 			if displayedProgress == 0 || displayedProgress >= 1 {
-				NSApp.dockTile.contentView = nil
+				NSApp?.dockTile.contentView = nil
 			}
- 		}
+		}
 	}
 
 	/**
@@ -148,135 +151,15 @@ public enum DockProgress {
 
 	private static func updateDockIcon() {
 		dockContentView.needsDisplay = true
-		NSApp.dockTile.display()
+		NSApp?.dockTile.display()
 	}
 
-	private final class ContentView: NSView {
-		override func draw(_ dirtyRect: CGRect) {
-			NSGraphicsContext.current?.imageInterpolation = .high
-
-			NSApp.applicationIconImage?.draw(in: bounds)
-
-			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
-			guard
-				displayedProgress > 0,
-				displayedProgress < 1
-			else {
-				return
-			}
-
-			switch style {
-			case .bar:
-				drawProgressBar(bounds)
-			case .squircle(let inset, let color):
-				drawProgressSquircle(bounds, inset: inset, color: color)
-			case .circle(let radius, let color):
-				drawProgressCircle(bounds, radius: radius, color: color)
-			case .badge(let color, let badgeValue):
-				drawProgressBadge(bounds, color: color, badgeLabel: badgeValue())
-			case .pie(let color):
-				drawProgressBadge(bounds, color: color, badgeLabel: 0, isPie: true)
-			case .custom(let drawingHandler):
-				drawingHandler(bounds)
-			}
-		}
-	}
-
-	private static func drawProgressBar(_ dstRect: CGRect) {
-		func roundedRect(_ rect: CGRect) {
-			NSBezierPath(roundedRect: rect, cornerRadius: rect.height / 2).fill()
-		}
-
-		let bar = CGRect(x: 0, y: 20, width: dstRect.width, height: 10)
-		NSColor.white.withAlpha(0.8).set()
-		roundedRect(bar)
-
-		let barInnerBg = bar.insetBy(dx: 0.5, dy: 0.5)
-		NSColor.black.withAlpha(0.8).set()
-		roundedRect(barInnerBg)
-
-		var barProgress = bar.insetBy(dx: 1, dy: 1)
-		barProgress.size.width = barProgress.width * displayedProgress
-		NSColor.white.set()
-		roundedRect(barProgress)
-	}
-
-	private static func drawProgressSquircle(_ dstRect: CGRect, inset: Double? = nil, color: NSColor) {
+	private static func withCGContext(_ action: (CGContext) -> Void) {
 		guard let cgContext = NSGraphicsContext.current?.cgContext else {
 			return
 		}
 
-		let defaultInset = 14.4
-
-		var rect = dstRect.insetBy(dx: defaultInset, dy: defaultInset)
-
-		if let inset {
-			rect = rect.insetBy(dx: inset, dy: inset)
-		}
-
-		let progressSquircle = ProgressSquircleShapeLayer(rect: rect)
-		progressSquircle.strokeColor = color.cgColor
-		progressSquircle.lineWidth = 5
-		progressSquircle.progress = displayedProgress
-		progressSquircle.render(in: cgContext)
-	}
-
-	private static func drawProgressCircle(_ dstRect: CGRect, radius: Double, color: NSColor) {
-		guard let cgContext = NSGraphicsContext.current?.cgContext else {
-			return
-		}
-
-		let progressCircle = ProgressCircleShapeLayer(radius: radius, center: dstRect.center)
-		progressCircle.strokeColor = color.cgColor
-		progressCircle.lineWidth = 4
-		progressCircle.progress = displayedProgress
-		progressCircle.render(in: cgContext)
-	}
-
-	private static func drawProgressBadge(_ dstRect: CGRect, color: NSColor, badgeLabel: Int, isPie: Bool = false) {
-		guard let cgContext = NSGraphicsContext.current?.cgContext else {
-			return
-		}
-
-		let radius = dstRect.width / 4.8
-		let newCenter = CGPoint(x: dstRect.maxX - radius - 4, y: dstRect.minY + radius + 4)
-
-		// Background
-		let badge = ProgressCircleShapeLayer(radius: radius, center: newCenter)
-		badge.fillColor = CGColor(red: 0.94, green: 0.96, blue: 1, alpha: 1)
-		badge.shadowColor = .black
-		badge.shadowOpacity = 0.3
-		badge.masksToBounds = false
-		badge.shadowOffset = CGSize(width: -1, height: 1)
-		badge.shadowPath = badge.path
-
-		// Progress circle
-		let lineWidth = isPie ? radius : 6.0
-		let innerRadius = radius - lineWidth / 2
-		let progressCircle = ProgressCircleShapeLayer(radius: innerRadius, center: newCenter)
-		progressCircle.strokeColor = color.cgColor
-		progressCircle.lineWidth = lineWidth
-		progressCircle.lineCap = .butt
-		progressCircle.progress = displayedProgress
-
-		// Label
-		if !isPie {
-			let dimension = badge.bounds.height - 5
-			let rect = CGRect(origin: progressCircle.bounds.origin, size: CGSize(width: dimension, height: dimension))
-			let textLayer = VerticallyCenteredTextLayer(frame: rect, center: newCenter)
-			let badgeText = kiloShortStringFromInt(number: badgeLabel)
-			textLayer.foregroundColor = CGColor(red: 0.23, green: 0.23, blue: 0.24, alpha: 1)
-			textLayer.string = badgeText
-			textLayer.fontSize = scaledBadgeFontSize(text: badgeText)
-			textLayer.font = NSFont.helveticaNeueBold
-			textLayer.alignmentMode = .center
-			textLayer.truncationMode = .end
-
-			badge.addSublayer(textLayer)
-		}
-
-		badge.addSublayer(progressCircle)
-		badge.render(in: cgContext)
+		action(cgContext)
 	}
 
 	/**
@@ -288,22 +171,20 @@ public enum DockProgress {
 	10000 => 9K+
 	```
 	*/
-	private static func kiloShortStringFromInt(number: Int) -> String {
-		let sign = number.signum()
+	static func kiloShortStringFromInt(number: Int) -> String {
 		let absNumber = abs(number)
 
-		if absNumber < 1000 {
+		switch absNumber {
+		case 0..<1000:
 			return "\(number)"
+		case 1000..<10_000:
+			return "\(number.signum() * (absNumber / 1000))k"
+		default:
+			return "\(number.signum() * 9)k+"
 		}
-
-		if absNumber < 10_000 {
-			return "\(sign * Int(absNumber / 1000))k"
-		}
-
-		return "\(sign * 9)k+"
 	}
 
-	private static func scaledBadgeFontSize(text: String) -> Double {
+	static func scaledBadgeFontSize(text: String) -> Double {
 		switch text.count {
 		case 1:
 			30
@@ -346,7 +227,7 @@ extension DockProgress {
 
 		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-squircle.gif?raw=true)
 		*/
-		case squircle(inset: Double? = nil, color: NSColor = .controlAccentColor)
+		case squircle(inset: Double? = nil, color: Color = .accentColor)
 
 		/**
 		Circle style.
@@ -357,7 +238,7 @@ extension DockProgress {
 
 		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-circle.gif?raw=true)
 		*/
-		case circle(radius: Double, color: NSColor = .controlAccentColor)
+		case circle(radius: Double, color: Color = .accentColor)
 
 		/**
 		Badge style.
@@ -372,7 +253,7 @@ extension DockProgress {
 
 		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-badge.gif?raw=true)
 		*/
-		case badge(color: NSColor = .controlAccentColor, badgeValue: @MainActor @Sendable () -> Int)
+		case badge(color: Color = .accentColor, badgeValue: @MainActor () -> Int)
 
 		/**
 		Pie style.
@@ -382,15 +263,350 @@ extension DockProgress {
 
 		![](https://github.com/sindresorhus/DockProgress/blob/main/screenshot-pie.gif?raw=true)
 		*/
-		case pie(color: NSColor = .controlAccentColor)
-
+		case pie(color: Color = .accentColor)
 
 		/**
-		Custom style.
+		Custom style using a SwiftUI view.
+
+		- Parameters:
+			- view: A closure that returns a SwiftUI view to display as the progress indicator.
+
+		- Note: The view will be overlaid on top of the app icon. Make sure to design your view with transparency in mind.
+		*/
+		case customView(@MainActor (_ progress: Double) -> any View)
+
+		/**
+		Custom style using SwiftUI Canvas for drawing.
+
+		- Parameters:
+			- canvasRenderer: A closure that draws directly on a SwiftUI Canvas.
+
+		- Note: This provides a SwiftUI-native way to create custom progress indicators with immediate mode drawing.
+		*/
+		case customCanvas(@MainActor (_ context: GraphicsContext, _ size: CGSize, _ progress: Double) -> Void)
+
+		/**
+		Custom style using legacy Core Graphics drawing.
 
 		- Parameters:
 			- drawHandler: A closure that is responsible for drawing the custom progress.
 		*/
-		case custom(drawHandler: @MainActor @Sendable (_ rect: CGRect) -> Void)
+		case custom(drawHandler: @MainActor (_ rect: CGRect) -> Void)
+	}
+}
+
+extension DockProgress {
+	private final class ContentView: NSView {
+		private var hostingView: NSView?
+
+		override func draw(_ dirtyRect: CGRect) {
+			NSGraphicsContext.current?.imageInterpolation = .high
+
+			NSApp?.applicationIconImage?.draw(in: bounds)
+
+			// TODO: If the `progress` is 1, draw the full circle, then schedule another draw in n milliseconds to hide it
+			guard
+				displayedProgress > 0,
+				displayedProgress < 1
+			else {
+				hostingView?.removeFromSuperview()
+				hostingView = nil
+				return
+			}
+
+			switch style {
+			case .bar:
+				updateHostingView(with: CanvasBarStyle(progress: displayedProgress))
+			case .squircle(let inset, let color):
+				updateHostingView(with: CanvasSquircleStyle(progress: displayedProgress, inset: inset, color: color))
+			case .circle(let radius, let color):
+				updateHostingView(with: CanvasCircleStyle(progress: displayedProgress, radius: radius, color: color))
+			case .badge(let color, let badgeValue):
+				updateHostingView(with: CanvasBadgeStyle(progress: displayedProgress, color: color, badgeValue: badgeValue()))
+			case .pie(let color):
+				updateHostingView(with: CanvasPieStyle(progress: displayedProgress, color: color))
+			case .custom(let drawingHandler):
+				hostingView?.removeFromSuperview()
+				hostingView = nil
+				drawingHandler(bounds)
+			case .customView(let viewProvider):
+				updateHostingView(with: viewProvider(displayedProgress))
+			case .customCanvas(let canvasRenderer):
+				updateHostingView(with: Canvas { context, size in
+					canvasRenderer(context, size, displayedProgress)
+				})
+			}
+		}
+
+		private func updateHostingView(with view: any View) {
+			if hostingView == nil {
+				let hosting = NSHostingView(rootView: AnyView(view))
+				hosting.frame = bounds
+				hosting.autoresizingMask = [.width, .height]
+				addSubview(hosting)
+				hostingView = hosting
+			} else if let hosting = hostingView as? NSHostingView<AnyView> {
+				hosting.rootView = AnyView(view)
+			}
+		}
+	}
+}
+
+private extension DockProgress {
+	/**
+	Standard frame dimensions for all Canvas styles.
+	*/
+	static let canvasFrameWidth: CGFloat = 128
+	static let canvasFrameHeight: CGFloat = 128
+
+	/**
+	Progress multiplier to ensure start and end points meet (accounts for round line caps).
+	*/
+	static let progressMultiplier: Double = 1.02
+}
+
+extension Path {
+	/**
+	Creates a superellipse (squircle) path within the given rectangle.
+	*/
+	static func squircle(in rect: CGRect) -> Path {
+		let minSide = min(rect.width, rect.height)
+		let radius = min(rect.width / 2, minSide / 2)
+
+		let corners = (
+			topLeft: CGPoint(x: rect.minX, y: rect.minY),
+			topRight: CGPoint(x: rect.maxX, y: rect.minY),
+			bottomLeft: CGPoint(x: rect.minX, y: rect.maxY),
+			bottomRight: CGPoint(x: rect.maxX, y: rect.maxY)
+		)
+
+		let points = (
+			p1: CGPoint(x: rect.minX + radius, y: rect.minY),
+			p2: CGPoint(x: rect.maxX - radius, y: rect.minY),
+			p3: CGPoint(x: rect.maxX, y: rect.minY + radius),
+			p4: CGPoint(x: rect.maxX, y: rect.maxY - radius),
+			p5: CGPoint(x: rect.maxX - radius, y: rect.maxY),
+			p6: CGPoint(x: rect.minX + radius, y: rect.maxY),
+			p7: CGPoint(x: rect.minX, y: rect.maxY - radius),
+			p8: CGPoint(x: rect.minX, y: rect.minY + radius)
+		)
+
+		return Path { path in
+			path.move(to: points.p1)
+			path.addLine(to: points.p2)
+			path.addCurve(to: points.p3, control1: corners.topRight, control2: corners.topRight)
+			path.addLine(to: points.p4)
+			path.addCurve(to: points.p5, control1: corners.bottomRight, control2: corners.bottomRight)
+			path.addLine(to: points.p6)
+			path.addCurve(to: points.p7, control1: corners.bottomLeft, control2: corners.bottomLeft)
+			path.addLine(to: points.p8)
+			path.addCurve(to: points.p1, control1: corners.topLeft, control2: corners.topLeft)
+		}
+	}
+
+	// Creates a progress circle path starting from the top and going clockwise.
+	static func progressCircle(center: CGPoint, radius: Double) -> Path {
+		Path { path in
+			path.addArc(
+				center: center,
+				radius: radius,
+				startAngle: .degrees(-90),
+				endAngle: .degrees(270),
+				clockwise: false
+			)
+		}
+	}
+}
+
+extension CGRect {
+	/**
+	Creates a rectangle for a circle with the given center and radius.
+	*/
+	static func circleRect(center: CGPoint, radius: Double) -> CGRect {
+		CGRect(
+			x: center.x - radius,
+			y: center.y - radius,
+			width: radius * 2,
+			height: radius * 2
+		)
+	}
+}
+
+struct CanvasBarStyle: View {
+	private static let barStrokeWidth = 10.0
+
+	let progress: Double
+
+	var body: some View {
+		Canvas { context, size in
+			let barInset = 8.0
+
+			let barRect = CGRect(
+				x: barInset,
+				y: size.height - 30,
+				width: size.width - (barInset * 2),
+				height: 10
+			)
+
+			// Background bar
+			context.fill(
+				RoundedRectangle(cornerRadius: 5).path(in: barRect),
+				with: .color(.white.opacity(0.8))
+			)
+
+			// Inner background
+			let innerRect = barRect.insetBy(dx: 0.5, dy: 0.5)
+			context.fill(
+				RoundedRectangle(cornerRadius: 4.5).path(in: innerRect),
+				with: .color(.black.opacity(0.8))
+			)
+
+			// Progress fill
+			let progressWidth = max(0, (barRect.width - 2) * progress)
+			if progressWidth > 0 {
+				let progressRect = CGRect(
+					x: barRect.minX + 1,
+					y: barRect.minY + 1,
+					width: progressWidth,
+					height: barRect.height - 2
+				)
+				context.fill(
+					RoundedRectangle(cornerRadius: 4).path(in: progressRect),
+					with: .color(.white)
+				)
+			}
+		}
+	}
+}
+
+struct CanvasSquircleStyle: View {
+	private static let squircleStrokeWidth = 5.0
+	private static let defaultSquircleInset = 14.4
+
+	let progress: Double
+	let inset: Double?
+	let color: Color
+
+	var body: some View {
+		Canvas { context, size in
+			let totalInset = Self.defaultSquircleInset + (inset ?? 0)
+			let rect = CGRect(origin: .zero, size: size).insetBy(dx: totalInset, dy: totalInset)
+			let path = Path.squircle(in: rect)
+
+			context.stroke(
+				path.trimmedPath(from: 0, to: progress * DockProgress.progressMultiplier),
+				with: .color(color),
+				style: StrokeStyle(lineWidth: Self.squircleStrokeWidth, lineCap: .round)
+			)
+		}
+	}
+}
+
+struct CanvasCircleStyle: View {
+	private static let circleStrokeWidth = 4.0
+
+	let progress: Double
+	let radius: Double
+	let color: Color
+
+	var body: some View {
+		Canvas { context, size in
+			let center = CGPoint(x: size.width / 2, y: size.height / 2)
+			let path = Path.progressCircle(center: center, radius: radius)
+
+			context.stroke(
+				path.trimmedPath(from: 0, to: progress * DockProgress.progressMultiplier),
+				with: .color(color),
+				style: StrokeStyle(lineWidth: Self.circleStrokeWidth, lineCap: .round)
+			)
+		}
+	}
+}
+
+struct CanvasBadgeStyle: View {
+	private static let radiusDivisor = 4.8
+	private static let progressInset = 3.0
+	private static let strokeWidth = 6.0
+	static let backgroundColor = Color(red: 0.94, green: 0.96, blue: 1.0)
+	static let textColor = Color(red: 0.23, green: 0.23, blue: 0.24)
+
+	let progress: Double
+	let color: Color
+	let badgeValue: Int
+
+	var body: some View {
+		Canvas { context, size in
+			let radius = size.width / Self.radiusDivisor
+			let center = CGPoint(x: size.width - radius - 4, y: size.height - radius - 4)
+
+			// Background
+			let bgRect = CGRect.circleRect(center: center, radius: radius)
+			context.fill(
+				Circle().path(in: bgRect),
+				with: .color(Self.backgroundColor)
+			)
+
+			// Progress ring
+			let progressRadius = radius - Self.progressInset
+			let progressRect = CGRect.circleRect(center: center, radius: progressRadius)
+			let circumference = 2 * .pi * progressRadius
+			let dashLength = circumference * progress * DockProgress.progressMultiplier
+
+			context.stroke(
+				Circle().path(in: progressRect),
+				with: .color(color),
+				style: StrokeStyle(
+					lineWidth: Self.strokeWidth,
+					lineCap: .butt,
+					dash: [dashLength, circumference]
+				)
+			)
+
+			// Badge text
+			let text = DockProgress.kiloShortStringFromInt(number: badgeValue)
+			context.draw(
+				Text(text)
+					.font(.system(size: DockProgress.scaledBadgeFontSize(text: text), weight: .bold))
+					.foregroundColor(Self.textColor),
+				at: center
+			)
+		}
+	}
+}
+
+struct CanvasPieStyle: View {
+	private static let radiusDivisor = 4.8
+
+	let progress: Double
+	let color: Color
+
+	var body: some View {
+		Canvas { context, size in
+			let radius = size.width / Self.radiusDivisor
+			let center = CGPoint(x: size.width - radius - 4, y: size.height - radius - 4)
+
+			// Background
+			let bgRect = CGRect.circleRect(center: center, radius: radius)
+			context.fill(
+				Circle().path(in: bgRect),
+				with: .color(CanvasBadgeStyle.backgroundColor)
+			)
+
+			// Pie wedge
+			if progress > 0 {
+				let path = Path { path in
+					path.move(to: center)
+					path.addArc(
+						center: center,
+						radius: radius,
+						startAngle: .degrees(-90),
+						endAngle: .degrees(-90 + 360 * progress),
+						clockwise: false
+					)
+					path.closeSubpath()
+				}
+				context.fill(path, with: .color(color))
+			}
+		}
 	}
 }

@@ -1,10 +1,10 @@
-// swift-tools-version:5.9
+// swift-tools-version:6.1
 import PackageDescription
 
 let package = Package(
 	name: "DockProgress",
 	platforms: [
-		.macOS(.v10_15)
+		.macOS(.v12)
 	],
 	products: [
 		.library(
@@ -17,6 +17,10 @@ let package = Package(
 	targets: [
 		.target(
 			name: "DockProgress"
+		),
+		.testTarget(
+			name: "DockProgressTests",
+			dependencies: ["DockProgress"]
 		)
 	]
 )

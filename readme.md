@@ -4,7 +4,7 @@
 
 ## Requirements
 
-macOS 10.15+
+macOS 12+
 
 ## Install
 
@@ -35,7 +35,7 @@ import Foundation
 import DockProgress
 
 let progress = Progress(totalUnitCount: 1)
-progress?.becomeCurrent(withPendingUnitCount: 1)
+progress.becomeCurrent(withPendingUnitCount: 1)
 
 DockProgress.progressInstance = progress
 ```
@@ -44,11 +44,17 @@ The given `Progress` instance is weakly stored. It's up to you to retain it.
 
 ## Styles
 
-It comes with five styles. PR welcome for more.
+Includes built-in styles (bar, squircle, circle, badge, pie) plus support for custom styles using SwiftUI views or Canvas drawing.
 
-Check out the example app in the Xcode project.
+See the example app in the Xcode project for demonstrations.
 
-You can also draw a custom progress with `.custom(drawHandler: (_ rect: CGRect) -> Void)`.
+### Custom Styles
+
+Create custom progress indicators with:
+
+1. **SwiftUI View**: `.customView { progress in /* return any View */ }` - Maximum flexibility with any SwiftUI view
+2. **SwiftUI Canvas**: `.customCanvas { context, size, progress in /* draw on canvas */ }` - High-performance custom drawing
+3. **Legacy Core Graphics**: `.custom(drawHandler: (_ rect: CGRect) -> Void)` - Direct Core Graphics drawing (backward compatibility)
 
 ### Bar
 
@@ -69,10 +75,10 @@ This is the default.
 ```swift
 import DockProgress
 
-DockProgress.style = .squircle(color: .white.withAlphaComponent(0.5))
+DockProgress.style = .squircle(color: .white.opacity(0.5))
 ```
 
-By default, it should perfectly fit a macOS 11 and later icon, but there is an `inset` parameter if you need to make any adjustments.
+Fits perfectly around macOS app icons by default. Use the `inset` parameter for adjustments if needed.
 
 ### Circle
 
@@ -81,7 +87,7 @@ By default, it should perfectly fit a macOS 11 and later icon, but there is an `
 ```swift
 import DockProgress
 
-DockProgress.style = .circle(radius: 55, color: .systemBlue)
+DockProgress.style = .circle(radius: 55, color: .blue)
 ```
 
 ### Badge
@@ -91,12 +97,12 @@ DockProgress.style = .circle(radius: 55, color: .systemBlue)
 ```swift
 import DockProgress
 
-DockProgress.style = .badge(color: .systemBlue, badgeValue: { getDownloadCount() })
+DockProgress.style = .badge(color: .blue, badgeValue: { getDownloadCount() })
 ```
 
-Large `badgeValue` numbers will be written in kilo short notation, for example, `1012` → `1k`.
+Large numbers are shortened: `1012` → `1k`, `10000` → `9k+`.
 
-**Note:** The `badgeValue` is not meant to be used as a numeric percentage. It's for things like count of downloads, number of files being converted, etc.
+**Note:** `badgeValue` is for counts (downloads, files, etc.), not percentages.
 
 ### Pie
 
@@ -105,7 +111,7 @@ Large `badgeValue` numbers will be written in kilo short notation, for example, 
 ```swift
 import DockProgress
 
-DockProgress.style = .pie(color: .systemBlue)
+DockProgress.style = .pie(color: .blue)
 ```
 
 ## Related

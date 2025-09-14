@@ -157,6 +157,7 @@ extension NSColor {
 
 
 extension NSFont {
+	@MainActor
 	static let helveticaNeueBold = NSFont(name: "HelveticaNeue-Bold", size: 0)
 }
 
@@ -350,11 +351,12 @@ An observer that invokes a callback for each screen refresh.
 
 This is useful for creating smooth animations that synchronize with the screen's refresh rate.
 */
+@MainActor
 final class DisplayLinkObserver {
-	private var displayLink: CVDisplayLink?
+	nonisolated(unsafe) private var displayLink: CVDisplayLink?
 	fileprivate let callback: (DisplayLinkObserver, Double) -> Void
 
-	init(_ callback: @escaping (DisplayLinkObserver, Double) -> Void) {
+	init(_ callback: @escaping @MainActor (DisplayLinkObserver, Double) -> Void) {
 		self.callback = callback
 
 		guard CVDisplayLinkCreateWithActiveCGDisplays(&displayLink) == kCVReturnSuccess else {
@@ -368,7 +370,7 @@ final class DisplayLinkObserver {
 		stop()
 	}
 
-	func start() {
+	nonisolated func start() {
 		guard let displayLink else {
 			return
 		}
@@ -383,7 +385,7 @@ final class DisplayLinkObserver {
 		CVDisplayLinkStart(displayLink)
 	}
 
-	func stop() {
+	nonisolated func stop() {
 		guard let displayLink else {
 			return
 		}
@@ -408,7 +410,9 @@ private func displayLinkOutputCallback(
 		refreshPeriod = 1.0 / 60.0
 	}
 
-	observer.callback(observer, refreshPeriod)
+	Task { @MainActor in
+		observer.callback(observer, refreshPeriod)
+	}
 
 	return kCVReturnSuccess
 }
