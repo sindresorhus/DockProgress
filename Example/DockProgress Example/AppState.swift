@@ -28,23 +28,31 @@ final class AppState {
 		]
 
 		var stylesIterator = styles.makeIterator()
-		DockProgress.style = stylesIterator.next()!
 
-		DockProgress.resetProgress()
+		func advanceToNextStyle() {
+			if let style = stylesIterator.next() {
+				DockProgress.resetProgress()
+				DockProgress.style = style
+				return
+			}
+
+			stylesIterator = styles.makeIterator()
+
+			if let style = stylesIterator.next() {
+				DockProgress.resetProgress()
+				DockProgress.style = style
+			}
+		}
+
+		advanceToNextStyle()
 
 		Timer.scheduledTimer(withTimeInterval: 0.5, repeats: true) { _ in
 			Task { @MainActor in
-				DockProgress.progress += 0.2
-
 				if DockProgress.displayedProgress >= 1 {
-					if let style = stylesIterator.next() {
-						DockProgress.resetProgress()
-						DockProgress.style = style
-					} else {
-						// Reset iterator when all is looped.
-						stylesIterator = styles.makeIterator()
-					}
+					advanceToNextStyle()
 				}
+
+				DockProgress.progress = min(DockProgress.progress + 0.2, 1)
 			}
 		}
 	}

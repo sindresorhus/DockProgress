@@ -62,11 +62,11 @@ struct DockProgressTests {
 	func builtInStyles() {
 		let testData: [(DockProgress.Style, String, Double)] = [
 			(.bar, "bar", 0.3),
-			(.squircle(color: .systemBlue), "squircle", 0.5),
-			(.squircle(inset: 5, color: .systemRed), "squircle with inset", 0.6),
-			(.circle(radius: 30, color: .systemGreen), "circle", 0.7),
-			(.badge(color: .systemPurple) { 42 }, "badge", 0.8),
-			(.pie(color: .systemOrange), "pie", 0.9)
+			(.squircle(color: .blue), "squircle", 0.5),
+			(.squircle(inset: 5, color: .red), "squircle with inset", 0.6),
+			(.circle(radius: 30, color: .green), "circle", 0.7),
+			(.badge(color: .purple) { 42 }, "badge", 0.8),
+			(.pie(color: .orange), "pie", 0.9)
 		]
 
 		for (style, name, progress) in testData {
@@ -117,9 +117,45 @@ struct DockProgressTests {
 		DockProgress.progress = 0.4
 		#expect(DockProgress.progress == 0.4)
 
-		DockProgress.style = .circle(radius: 30, color: .systemBlue)
+		DockProgress.style = .circle(radius: 30, color: .blue)
 		DockProgress.progress = 0.8
 		#expect(DockProgress.progress == 0.8)
+	}
+
+	@Test("Reset removes hosting view before rendering a new style")
+	func hostingViewResetsBetweenCycles() {
+		DockProgress.style = .bar
+		DockProgress.testingRenderCurrentStyle(progress: 0.5)
+		#expect(DockProgress.testingHasActiveHostingView)
+
+		DockProgress.resetProgress()
+		#expect(!DockProgress.testingHasActiveHostingView)
+
+		DockProgress.style = .customView { progress in
+			AnyView(
+				Text("\(Int(progress * 100))%")
+					.font(.system(size: 14, weight: .semibold))
+			)
+		}
+		DockProgress.testingRenderCurrentStyle(progress: 0.4)
+		#expect(DockProgress.testingHasActiveHostingView)
+
+		DockProgress.resetProgress()
+	}
+
+	@Test("Hosting view clears when Dock content hides")
+	func hostingViewClearsWhenHidden() {
+		DockProgress.style = .bar
+		DockProgress.testingRenderCurrentStyle(progress: 0.6)
+		#expect(DockProgress.testingHasActiveHostingView)
+
+		DockProgress.testingRenderCurrentStyle(progress: 0)
+		#expect(!DockProgress.testingHasActiveHostingView)
+
+		DockProgress.testingRenderCurrentStyle(progress: 1)
+		#expect(!DockProgress.testingHasActiveHostingView)
+
+		DockProgress.resetProgress()
 	}
 
 	// MARK: - Utility Function Tests

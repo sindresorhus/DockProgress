@@ -11,6 +11,7 @@ public enum DockProgress {
 	private static var progressObserver: NSKeyValueObservation?
 	private static var finishedObserver: NSKeyValueObservation?
 	private static var elapsedTimeSinceLastRefresh = 0.0
+	private static var isResetting = false
 
 	// TODO: Use `CADisplayLink` on macOS 14.
 	private static var displayLinkObserver: DisplayLinkObserver = {
@@ -111,8 +112,20 @@ public enum DockProgress {
 		didSet {
 			if progress > 0 {
 				NSApp?.dockTile.contentView = dockContentView
-				displayLinkObserver.start()
+				// Snap only when coming from completed state (>= 1), not from 0
+				if displayedProgress >= 1 {
+					displayedProgress = progress
+					elapsedTimeSinceLastRefresh = 0
+					updateDockIcon()
+				} else {
+					displayLinkObserver.start()
+				}
 			} else {
+				displayLinkObserver.stop()
+				displayedProgress = max(0, min(1, progress))
+				if !isResetting {
+					NSApp?.dockTile.contentView = nil
+				}
 				updateDockIcon()
 			}
 		}
@@ -124,7 +137,7 @@ public enum DockProgress {
 	public private(set) static var displayedProgress = 0.0 {
 		didSet {
 			if displayedProgress == 0 || displayedProgress >= 1 {
-				NSApp?.dockTile.contentView = nil
+				dockContentView.resetHostingView()
 			}
 		}
 	}
@@ -133,11 +146,20 @@ public enum DockProgress {
 	Reset the progress without animating.
 	*/
 	public static func resetProgress() {
+		isResetting = true
 		displayLinkObserver.stop()
-		progress = 0
 		displayedProgress = 0
+		progress = 0
 		elapsedTimeSinceLastRefresh = 0
-		updateDockIcon()
+		isResetting = false
+
+		// Only remove contentView if not immediately restarting progress
+		DispatchQueue.main.async {
+			if progress == 0 {
+				NSApp?.dockTile.contentView = nil
+				updateDockIcon()
+			}
+		}
 	}
 
 	/**
@@ -299,6 +321,15 @@ extension DockProgress {
 	private final class ContentView: NSView {
 		private var hostingView: NSView?
 
+		func resetHostingView() {
+			hostingView?.removeFromSuperview()
+			hostingView = nil
+		}
+
+		var hasHostingView: Bool {
+			hostingView != nil
+		}
+
 		override func draw(_ dirtyRect: CGRect) {
 			NSGraphicsContext.current?.imageInterpolation = .high
 
@@ -309,8 +340,7 @@ extension DockProgress {
 				displayedProgress > 0,
 				displayedProgress < 1
 			else {
-				hostingView?.removeFromSuperview()
-				hostingView = nil
+				resetHostingView()
 				return
 			}
 
@@ -326,8 +356,7 @@ extension DockProgress {
 			case .pie(let color):
 				updateHostingView(with: CanvasPieStyle(progress: displayedProgress, color: color))
 			case .custom(let drawingHandler):
-				hostingView?.removeFromSuperview()
-				hostingView = nil
+				resetHostingView()
 				drawingHandler(bounds)
 			case .customView(let viewProvider):
 				updateHostingView(with: viewProvider(displayedProgress))
@@ -348,7 +377,29 @@ extension DockProgress {
 			} else if let hosting = hostingView as? NSHostingView<AnyView> {
 				hosting.rootView = AnyView(view)
 			}
+
+			// Force immediate layout and display to ensure Canvas renders with current displayedProgress value.
+			// Without this, Canvas would render on the next frame using the previous progress value.
+			hostingView?.layoutSubtreeIfNeeded()
+			hostingView?.displayIfNeeded()
 		}
+	}
+}
+
+extension DockProgress {
+	static func testingRenderCurrentStyle(progress: Double) {
+		dockContentView.frame = CGRect(
+			x: 0,
+			y: 0,
+			width: canvasFrameWidth,
+			height: canvasFrameHeight
+		)
+		displayedProgress = progress
+		dockContentView.draw(dockContentView.bounds)
+	}
+
+	static var testingHasActiveHostingView: Bool {
+		dockContentView.hasHostingView
 	}
 }
 
