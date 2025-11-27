@@ -599,18 +599,12 @@ struct CanvasBadgeStyle: View {
 
 			// Progress ring
 			let progressRadius = radius - Self.progressInset
-			let progressRect = CGRect.circleRect(center: center, radius: progressRadius)
-			let circumference = 2 * .pi * progressRadius
-			let dashLength = circumference * progress * DockProgress.progressMultiplier
+			let progressPath = Path.progressCircle(center: center, radius: progressRadius)
 
 			context.stroke(
-				Circle().path(in: progressRect),
+				progressPath.trimmedPath(from: 0, to: progress * DockProgress.progressMultiplier),
 				with: .color(color),
-				style: StrokeStyle(
-					lineWidth: Self.strokeWidth,
-					lineCap: .butt,
-					dash: [dashLength, circumference]
-				)
+				style: StrokeStyle(lineWidth: Self.strokeWidth, lineCap: .butt)
 			)
 
 			// Badge text
