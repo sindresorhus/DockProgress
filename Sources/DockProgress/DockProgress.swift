@@ -36,11 +36,7 @@ public enum DockProgress {
 		}
 	}()
 
-	private static let dockContentView: ContentView = {
-		let view = ContentView()
-		NSApp?.dockTile.contentView = view
-		return view
-	}()
+	private static let dockContentView = ContentView()
 
 	/**
 	Assign a [`Progress`](https://developer.apple.com/documentation/foundation/progress) instance to track the progress status.
@@ -71,7 +67,9 @@ public enum DockProgress {
 			// TODO: Use AsyncSequence when targeting macOS 15.
 			progressObserver = progressInstance.observe(\.fractionCompleted) { sender, _ in
 				Task { @MainActor in
+					// `Self.` is required because the `guard let` binding above is captured and would keep passing after the instance is cleared.
 					guard
+						sender === Self.progressInstance,
 						!sender.isCancelled,
 						!sender.isFinished
 					else {
@@ -85,6 +83,7 @@ public enum DockProgress {
 			finishedObserver = progressInstance.observe(\.isFinished) { sender, _ in
 				Task { @MainActor in
 					guard
+						sender === Self.progressInstance,
 						!sender.isCancelled,
 						sender.isFinished
 					else {
@@ -138,6 +137,11 @@ public enum DockProgress {
 		didSet {
 			if displayedProgress == 0 || displayedProgress >= 1 {
 				dockContentView.resetHostingView()
+			}
+
+			// A dock tile content view replaces the whole tile, so remove it once finished to show the plain app icon again.
+			if displayedProgress >= 1 {
+				NSApp?.dockTile.contentView = nil
 			}
 		}
 	}

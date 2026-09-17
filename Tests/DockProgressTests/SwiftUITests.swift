@@ -40,6 +40,23 @@ struct DockProgressTests {
 		#expect(DockProgress.displayedProgress == 0)
 	}
 
+	@Test("Dock tile content view is only installed while progress is showing")
+	func dockTileContentView() {
+		let dockTile = NSApplication.shared.dockTile
+
+		DockProgress.progress = 0.5
+		#expect(dockTile.contentView != nil)
+
+		DockProgress.testingRenderCurrentStyle(progress: 1)
+		#expect(dockTile.contentView == nil)
+
+		DockProgress.progress = 0.3
+		#expect(dockTile.contentView != nil)
+
+		DockProgress.progress = 0
+		#expect(dockTile.contentView == nil)
+	}
+
 	@Test("Progress instance integration")
 	func progressInstance() {
 		let progress = Progress(totalUnitCount: 100)
@@ -54,6 +71,47 @@ struct DockProgressTests {
 
 		DockProgress.progressInstance = nil
 		#expect(DockProgress.progressInstance == nil)
+	}
+
+	@Test("Clearing the progress instance is not undone by a queued update")
+	func clearingProgressInstance() async {
+		DockProgress.resetProgress()
+		let source = Progress(totalUnitCount: 100)
+		source.completedUnitCount = 50
+		DockProgress.progressInstance = source
+		DockProgress.progressInstance = nil
+
+		// Let any queued observation task on the main actor run before asserting.
+		for _ in 0..<10 {
+			await Task.yield()
+		}
+
+		#expect(DockProgress.progress == 0)
+	}
+
+	@Test("A new progress instance still tracks after a previous one was cleared")
+	func newProgressInstanceTracks() async {
+		DockProgress.resetProgress()
+		let first = Progress(totalUnitCount: 100)
+		first.completedUnitCount = 50
+		DockProgress.progressInstance = first
+		DockProgress.progressInstance = nil
+
+		for _ in 0..<10 {
+			await Task.yield()
+		}
+
+		let second = Progress(totalUnitCount: 100)
+		DockProgress.progressInstance = second
+		second.completedUnitCount = 80
+
+		for _ in 0..<10 {
+			await Task.yield()
+		}
+
+		#expect(DockProgress.progress == 0.8)
+
+		DockProgress.progressInstance = nil
 	}
 
 	// MARK: - Style Tests
