@@ -18,11 +18,11 @@ Add `https://github.com/sindresorhus/DockProgress` in the [“Swift Package Mana
 
 ## Usage
 
+The snippets below are statements, so they must go inside a function (not at the top level of a file) and run on the main actor.
+
 ### Manually set the progress
 
 ```swift
-import DockProgress
-
 foo.onUpdate = { progress in
 	DockProgress.progress = progress
 }
@@ -71,6 +71,26 @@ Includes built-in styles (bar, squircle, circle, badge, pie) plus support for cu
 
 See the example app in the Xcode project for demonstrations.
 
+Set the style once at launch. For example, in a SwiftUI app:
+
+```swift
+import SwiftUI
+import DockProgress
+
+@main
+struct MyApp: App {
+	init() {
+		DockProgress.style = .squircle(color: .white.opacity(0.5))
+	}
+
+	var body: some Scene {
+		WindowGroup {
+			ContentView()
+		}
+	}
+}
+```
+
 ### Custom Styles
 
 Create custom progress indicators with:
@@ -84,8 +104,6 @@ Create custom progress indicators with:
 ![](screenshot-bar.gif)
 
 ```swift
-import DockProgress
-
 DockProgress.style = .bar
 ```
 
@@ -96,8 +114,6 @@ This is the default.
 <img src="screenshot-squircle.gif" width="158" height="158">
 
 ```swift
-import DockProgress
-
 DockProgress.style = .squircle(color: .white.opacity(0.5))
 ```
 
@@ -108,8 +124,6 @@ Fits perfectly around macOS app icons by default. Use the `inset` parameter for 
 ![](screenshot-circle.gif)
 
 ```swift
-import DockProgress
-
 DockProgress.style = .circle(radius: 55, color: .blue)
 ```
 
@@ -118,8 +132,6 @@ DockProgress.style = .circle(radius: 55, color: .blue)
 ![](screenshot-badge.gif)
 
 ```swift
-import DockProgress
-
 DockProgress.style = .badge(color: .blue, badgeValue: { getDownloadCount() })
 ```
 
@@ -132,8 +144,6 @@ Large numbers are shortened: `1012` → `1k`, `10000` → `9k+`.
 <img src="screenshot-pie.gif" width="150" height="150">
 
 ```swift
-import DockProgress
-
 DockProgress.style = .pie(color: .blue)
 ```
 
